@@ -1,4 +1,4 @@
-namespace Result.net.tests;
+namespace SResult.Tests;
 
 public class UnitTest1
 {
@@ -32,7 +32,7 @@ public class UnitTest1
     public void Test4()
     {
         const int expected = 1;
-        var result = Result<int, string>.CreateSuccessResponse(expected);
+        var result = Result<int, string>.CreateSuccessResult(expected);
         result
             .OnSuccess((actual) => { Assert.Equal(expected, actual); })
             .OnFailure(() => { Assert.Fail(); });
@@ -43,7 +43,7 @@ public class UnitTest1
     public void Test5()
     {
         const string expected = "Worthless";
-        var result = Result<int, string>.CreateFailureResponse(expected);
+        var result = Result<int, string>.CreateFailureResult(expected);
         result
             .OnSuccess(() => { Assert.Fail(); })
             .OnFailure((actual) => { Assert.Equal(expected, actual); });
@@ -54,7 +54,7 @@ public class UnitTest1
     {
         try
         {
-            var result = Result<string, string>.CreateSuccessResponse(null);
+            var result = Result<string, string>.CreateSuccessResult(null);
             Assert.Fail();
         }
         catch (ArgumentNullException)
@@ -68,7 +68,7 @@ public class UnitTest1
     {
         try
         {
-            var result = Result<string, string>.CreateFailureResponse(null);
+            var result = Result<string, string>.CreateFailureResult(null);
             Assert.Fail();
         }
         catch (ArgumentNullException)
@@ -83,9 +83,9 @@ public class UnitTest1
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return Result<string, string>.CreateFailureResponse("Input cannot be null");
+            return Result<string, string>.CreateFailureResult("Input cannot be null");
         }
 
-        return Result<string, string>.CreateSuccessResponse(value);
+        return Result<string, string>.CreateSuccessResult(value);
     }
 }

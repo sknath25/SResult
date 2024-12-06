@@ -1,34 +1,34 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Result.net;
+namespace SResult;
 
-public sealed class Result<TSuccessResponse, TFailureResponse>
+public sealed class Result<TSuccessResult, TFailureResult>
 {
-    private readonly TSuccessResponse? _successResponse;
-    private readonly TFailureResponse? _failureResponse;
+    private readonly TSuccessResult? _successResult;
+    private readonly TFailureResult? _failureResult;
     private readonly bool _isSuccess;
 
-    private Result(bool isSuccess, TSuccessResponse? successResponse, TFailureResponse? failureResponse)
+    private Result(bool isSuccess, TSuccessResult? successResult, TFailureResult? failureResult)
     {
-        _successResponse = successResponse;
-        _failureResponse = failureResponse;
+        _successResult = successResult;
+        _failureResult = failureResult;
         _isSuccess = isSuccess;
     }
 
-    public bool IsSuccess([NotNullWhen(true)] out TSuccessResponse? successResponse, [NotNullWhen(false)] out TFailureResponse? failureResponse)
+    public bool IsSuccess([NotNullWhen(true)] out TSuccessResult? successResult, [NotNullWhen(false)] out TFailureResult? failureResult)
     {
-        successResponse = _successResponse;
-        failureResponse = _failureResponse;
+        successResult = _successResult;
+        failureResult = _failureResult;
         return _isSuccess;
     }
 
-    public bool IsSuccess([NotNullWhen(true)] out TSuccessResponse? successResponse)
+    public bool IsSuccess([NotNullWhen(true)] out TSuccessResult? successResult)
     {
-        successResponse = _successResponse;
+        successResult = _successResult;
         return _isSuccess;
     }
 
-    public Result<TSuccessResponse, TFailureResponse> OnSuccess(Action actionOnSuccess)
+    public Result<TSuccessResult, TFailureResult> OnSuccess(Action actionOnSuccess)
     {
         if (IsSuccess(out _))
         {
@@ -38,7 +38,7 @@ public sealed class Result<TSuccessResponse, TFailureResponse>
         return this;
     }
 
-    public Result<TSuccessResponse, TFailureResponse> OnSuccess(Action<TSuccessResponse> actionOnSuccess)
+    public Result<TSuccessResult, TFailureResult> OnSuccess(Action<TSuccessResult> actionOnSuccess)
     {
         if(IsSuccess(out var successResponse))
         {
@@ -48,7 +48,7 @@ public sealed class Result<TSuccessResponse, TFailureResponse>
         return this;
     }
 
-    public Result<TSuccessResponse, TFailureResponse> OnFailure(Action actionOnFailure)
+    public Result<TSuccessResult, TFailureResult> OnFailure(Action actionOnFailure)
     {
         if (!IsSuccess(out _, out _))
         {
@@ -58,7 +58,7 @@ public sealed class Result<TSuccessResponse, TFailureResponse>
         return this;
     }
 
-    public Result<TSuccessResponse, TFailureResponse> OnFailure(Action<TFailureResponse> actionOnFailure)
+    public Result<TSuccessResult, TFailureResult> OnFailure(Action<TFailureResult> actionOnFailure)
     {
         if (!IsSuccess(out _, out var failureResponse))
         {
@@ -68,23 +68,23 @@ public sealed class Result<TSuccessResponse, TFailureResponse>
         return this;
     }
 
-    public static Result<TSuccessResponse, TFailureResponse> CreateSuccessResponse(TSuccessResponse successResponse)
+    public static Result<TSuccessResult, TFailureResult> CreateSuccessResult(TSuccessResult successResult)
     {
-        if(successResponse == null) throw new ArgumentNullException(nameof(successResponse));
+        if(successResult == null) throw new ArgumentNullException(nameof(successResult));
 
-        return new Result<TSuccessResponse, TFailureResponse>(true, successResponse, default);
+        return new Result<TSuccessResult, TFailureResult>(true, successResult, default);
     }
 
-    public static Result<TSuccessResponse, TFailureResponse> CreateFailureResponse(TFailureResponse failureResponse)
+    public static Result<TSuccessResult, TFailureResult> CreateFailureResult(TFailureResult failureResult)
     {
-        if (failureResponse == null) throw new ArgumentNullException(nameof(failureResponse));
+        if (failureResult == null) throw new ArgumentNullException(nameof(failureResult));
 
-        return new Result<TSuccessResponse, TFailureResponse>(false, default, failureResponse);
+        return new Result<TSuccessResult, TFailureResult>(false, default, failureResult);
     }
 
-    public static implicit operator Result<TSuccessResponse, TFailureResponse> (TSuccessResponse successResponse)
-        => CreateSuccessResponse(successResponse);
+    public static implicit operator Result<TSuccessResult, TFailureResult> (TSuccessResult successResult)
+        => CreateSuccessResult(successResult);
 
-    public static implicit operator Result<TSuccessResponse, TFailureResponse>(TFailureResponse failureResponse)
-        => CreateFailureResponse(failureResponse);
+    public static implicit operator Result<TSuccessResult, TFailureResult>(TFailureResult failureResult)
+        => CreateFailureResult(failureResult);
 }

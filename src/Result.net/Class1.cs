@@ -15,16 +15,21 @@ public sealed class Result<TSuccessResult, TFailureResult>
         _isSuccess = isSuccess;
     }
 
-    public bool IsSuccess([NotNullWhen(true)] out TSuccessResult? successResult, [NotNullWhen(false)] out TFailureResult? failureResult)
+    public bool IsSuccess()
     {
-        successResult = _successResult;
-        failureResult = _failureResult;
         return _isSuccess;
     }
 
     public bool IsSuccess([NotNullWhen(true)] out TSuccessResult? successResult)
     {
         successResult = _successResult;
+        return _isSuccess;
+    }
+
+    public bool IsSuccess([NotNullWhen(true)] out TSuccessResult? successResult, [NotNullWhen(false)] out TFailureResult? failureResult)
+    {
+        successResult = _successResult;
+        failureResult = _failureResult;
         return _isSuccess;
     }
 

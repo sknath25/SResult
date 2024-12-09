@@ -1,0 +1,66 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/SResult.sln",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publish",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "${workspaceFolder}/src/SResult.sln",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "watch",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "run",
+                "--project",
+                "${workspaceFolder}/src/SResult.sln"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "coverage",
+            "command": "dotnet",
+            "dependsOn":"build",
+            "type": "process",
+            "args": [
+                "test",
+                "${workspaceFolder}/src/SResult.sln",
+                "/p:CollectCoverage=true",
+                "/p:CoverletOutputFormat=cobertura",
+                "/p:CoverletOutput=${workspaceFolder}/src/SResult.tests/coverage/results/"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "coverage-html",
+            "command": "reportgenerator",
+            "dependsOn":"coverage",
+            "type": "process",
+            "args": [
+                "-reports:${workspaceFolder}/src/SResult.tests/coverage/results/coverage.cobertura.xml",
+                "-targetdir:${workspaceFolder}/src/SResult.tests/coverage/reports/html",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+    ]
+}

@@ -35,6 +35,8 @@ public sealed class Result<TSuccessResult, TFailureReason>
 
     public Result<TSuccessResult, TFailureReason> OnSuccess(Action actionOnSuccess)
     {
+        if(actionOnSuccess == null) throw new ArgumentNullException(nameof(actionOnSuccess));
+
         if (IsSuccess(out _))
         {
             actionOnSuccess();
@@ -45,6 +47,8 @@ public sealed class Result<TSuccessResult, TFailureReason>
 
     public Result<TSuccessResult, TFailureReason> OnSuccess(Action<TSuccessResult> actionOnSuccess)
     {
+        if(actionOnSuccess == null) throw new ArgumentNullException(nameof(actionOnSuccess));
+
         if(IsSuccess(out var successResponse))
         {
             actionOnSuccess(successResponse);
@@ -55,6 +59,8 @@ public sealed class Result<TSuccessResult, TFailureReason>
 
     public Result<TSuccessResult, TFailureReason> OnFailure(Action actionOnFailure)
     {
+        if(actionOnFailure == null) throw new ArgumentNullException(nameof(actionOnFailure));
+
         if (!IsSuccess(out _, out _))
         {
             actionOnFailure();
@@ -65,6 +71,8 @@ public sealed class Result<TSuccessResult, TFailureReason>
 
     public Result<TSuccessResult, TFailureReason> OnFailure(Action<TFailureReason> actionOnFailure)
     {
+        if(actionOnFailure == null) throw new ArgumentNullException(nameof(actionOnFailure));
+
         if (!IsSuccess(out _, out var failureResponse))
         {
             actionOnFailure(failureResponse);

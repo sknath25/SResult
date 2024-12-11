@@ -2,16 +2,16 @@
 
 namespace SResult;
 
-public sealed class Result<TSuccessResult, TFailureResult>
+public sealed class Result<TSuccessResult, TFailureReason>
 {
     private readonly TSuccessResult? _successResult;
-    private readonly TFailureResult? _failureResult;
+    private readonly TFailureReason? _failureReason;
     private readonly bool _isSuccess;
 
-    private Result(bool isSuccess, TSuccessResult? successResult, TFailureResult? failureResult)
+    private Result(bool isSuccess, TSuccessResult? successResult, TFailureReason? failureReason)
     {
         _successResult = successResult;
-        _failureResult = failureResult;
+        _failureReason = failureReason;
         _isSuccess = isSuccess;
     }
 
@@ -26,14 +26,14 @@ public sealed class Result<TSuccessResult, TFailureResult>
         return _isSuccess;
     }
 
-    public bool IsSuccess([NotNullWhen(true)] out TSuccessResult? successResult, [NotNullWhen(false)] out TFailureResult? failureResult)
+    public bool IsSuccess([NotNullWhen(true)] out TSuccessResult? successResult, [NotNullWhen(false)] out TFailureReason? failureReason)
     {
         successResult = _successResult;
-        failureResult = _failureResult;
+        failureReason = _failureReason;
         return _isSuccess;
     }
 
-    public Result<TSuccessResult, TFailureResult> OnSuccess(Action actionOnSuccess)
+    public Result<TSuccessResult, TFailureReason> OnSuccess(Action actionOnSuccess)
     {
         if (IsSuccess(out _))
         {
@@ -43,7 +43,7 @@ public sealed class Result<TSuccessResult, TFailureResult>
         return this;
     }
 
-    public Result<TSuccessResult, TFailureResult> OnSuccess(Action<TSuccessResult> actionOnSuccess)
+    public Result<TSuccessResult, TFailureReason> OnSuccess(Action<TSuccessResult> actionOnSuccess)
     {
         if(IsSuccess(out var successResponse))
         {
@@ -53,7 +53,7 @@ public sealed class Result<TSuccessResult, TFailureResult>
         return this;
     }
 
-    public Result<TSuccessResult, TFailureResult> OnFailure(Action actionOnFailure)
+    public Result<TSuccessResult, TFailureReason> OnFailure(Action actionOnFailure)
     {
         if (!IsSuccess(out _, out _))
         {
@@ -63,7 +63,7 @@ public sealed class Result<TSuccessResult, TFailureResult>
         return this;
     }
 
-    public Result<TSuccessResult, TFailureResult> OnFailure(Action<TFailureResult> actionOnFailure)
+    public Result<TSuccessResult, TFailureReason> OnFailure(Action<TFailureReason> actionOnFailure)
     {
         if (!IsSuccess(out _, out var failureResponse))
         {
@@ -73,23 +73,23 @@ public sealed class Result<TSuccessResult, TFailureResult>
         return this;
     }
 
-    public static Result<TSuccessResult, TFailureResult> CreateSuccessResult(TSuccessResult successResult)
+    public static Result<TSuccessResult, TFailureReason> CreateSuccessResult(TSuccessResult successResult)
     {
         if(successResult == null) throw new ArgumentNullException(nameof(successResult));
 
-        return new Result<TSuccessResult, TFailureResult>(true, successResult, default);
+        return new Result<TSuccessResult, TFailureReason>(true, successResult, default);
     }
 
-    public static Result<TSuccessResult, TFailureResult> CreateFailureResult(TFailureResult failureResult)
+    public static Result<TSuccessResult, TFailureReason> CreateFailureReason(TFailureReason failureReason)
     {
-        if (failureResult == null) throw new ArgumentNullException(nameof(failureResult));
+        if (failureReason == null) throw new ArgumentNullException(nameof(failureReason));
 
-        return new Result<TSuccessResult, TFailureResult>(false, default, failureResult);
+        return new Result<TSuccessResult, TFailureReason>(false, default, failureReason);
     }
 
-    public static implicit operator Result<TSuccessResult, TFailureResult> (TSuccessResult successResult)
+    public static implicit operator Result<TSuccessResult, TFailureReason> (TSuccessResult successResult)
         => CreateSuccessResult(successResult);
 
-    public static implicit operator Result<TSuccessResult, TFailureResult>(TFailureResult failureResult)
-        => CreateFailureResult(failureResult);
+    public static implicit operator Result<TSuccessResult, TFailureReason>(TFailureReason failureReason)
+        => CreateFailureReason(failureReason);
 }

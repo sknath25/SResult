@@ -5,16 +5,14 @@ public class UnitTests
     [Fact]
     public void SuccessCheck()
     {
-        const int expected = 1;
-        var result = Result<int, string>.CreateSuccessResult(expected);
+        var result = Result.CreateSuccessResult(1);
         Assert.True(result.IsSuccess());
     }
 
     [Fact]
     public void FailCheck()
     {
-        const string error = "Something went wrong";
-        var result = Result<int, string>.CreateFailureReason(error);
+        var result = Result.CreateFailureReason(0);
         Assert.True(!result.IsSuccess());
     }
 
@@ -22,7 +20,7 @@ public class UnitTests
     public void OnSuccessResultCheck()
     {
         const int expected = 1;
-        var result = Result<int, string>.CreateSuccessResult(expected);
+        var result = Result.CreateSuccessResult(expected);
         result
             .OnSuccess((actual) => { Assert.Equal(expected, actual); })
             .OnFailure(() => { Assert.Fail(); });
@@ -32,7 +30,7 @@ public class UnitTests
     public void OnFailureReasonCheck()
     {
         const string expected = "Worthless";
-        var result = Result<int, string>.CreateFailureReason(expected);
+        var result = Result.CreateFailureReason(expected);
         result
             .OnSuccess(() => { Assert.Fail(); })
             .OnFailure((actual) => { Assert.Equal(expected, actual); });
@@ -42,7 +40,7 @@ public class UnitTests
     public void OnSuccessAndOnFailureBothCannotBeInvokedForFailure()
     {
         const string expected = "Worthless";
-        var result = Result<int, string>.CreateFailureReason(expected);
+        var result = Result.CreateFailureReason(expected);
         int methodInvocationCounter = 0;
 
         result
@@ -56,7 +54,7 @@ public class UnitTests
     public void OnSuccessAndOnFailureBothCannotBeInvokedForSuccess()
     {
         const int expected = 1;
-        var result = Result<int, string>.CreateSuccessResult(expected);
+        var result = Result.CreateSuccessResult<int, string>(expected);
         int methodInvocationCounter = 0;
 
         result
@@ -70,7 +68,7 @@ public class UnitTests
     public void FailureReasonWillBeNullForSuccess()
     {
         const int expected = 1;
-        var result = Result<int, string>.CreateSuccessResult(expected);
+        var result = Result.CreateSuccessResult(expected);
         if (result.IsSuccess(out var validResult, out var failureReason))
         {
             Assert.Null(failureReason);
@@ -86,7 +84,7 @@ public class UnitTests
     public void SuccessResultWillBeNullForFailure()
     {
         const string expected = "Worthless";
-        var result = Result<int, string>.CreateFailureReason(expected);
+        var result = Result.CreateFailureReason(expected);
         if (result.IsSuccess(out var validResult, out var failureReason))
         {
             Assert.Fail();
@@ -104,7 +102,7 @@ public class UnitTests
         try
         {
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            var result = Result<string, string>.CreateSuccessResult(null);
+            var result = Result.CreateSuccessResult<string, string>(null);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
             Assert.Fail();
         }
@@ -120,7 +118,7 @@ public class UnitTests
         try
         {
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            var result = Result<string, string>.CreateFailureReason(null);
+            var result = Result.CreateFailureReason<string, string>(null);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
             Assert.Fail();
         }
@@ -141,12 +139,12 @@ public class UnitTests
     }
 
     [Fact]
-    public void AutomaticMappingToSucessBasedOnReturnType()
+    public void AutomaticMappingToSuccessBasedOnReturnType()
     {
         const int expectedHttpCode = 200;
         var result = CallApi("http://somedomain.com");
         result
-            .OnSuccess((actuaHttpCode) => { Assert.Equal(expectedHttpCode, actuaHttpCode); })
+            .OnSuccess((actualHttpCode) => { Assert.Equal(expectedHttpCode, actualHttpCode); })
             .OnFailure(() => { Assert.Fail(); });
     }
 

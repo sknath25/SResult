@@ -1,4 +1,4 @@
-namespace SResult;
+﻿namespace SResult;
 
 public static class Result
 {

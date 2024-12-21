@@ -8,14 +8,18 @@ public sealed class Result<TSuccessResult, TFailureReason>
     private readonly TFailureReason? _failureReason;
     private readonly bool _isSuccess;
 
-    private Result(bool isSuccess, TSuccessResult? successResult, TFailureReason? failureReason)
+    private Result(TFailureReason? failureReason)
     {
-        if (isSuccess && successResult == null) throw new ArgumentNullException(nameof(successResult));
-        if (!isSuccess && failureReason == null) throw new ArgumentNullException(nameof(failureReason));
-
-        _successResult = successResult;
+        if (failureReason == null) throw new ArgumentNullException(nameof(failureReason));
         _failureReason = failureReason;
-        _isSuccess = isSuccess;
+        _isSuccess = false;
+    }
+
+    private Result(TSuccessResult successResult)
+    {
+        if (successResult == null) throw new ArgumentNullException(nameof(successResult));
+        _successResult = successResult;
+        _isSuccess = true;
     }
 
     public bool IsSuccess()
@@ -96,9 +100,8 @@ public sealed class Result<TSuccessResult, TFailureReason>
     }
 
     public static implicit operator Result<TSuccessResult, TFailureReason>(TSuccessResult successResult)
-        =>  new (true, successResult, default);
+        =>  new (successResult);
 
     public static implicit operator Result<TSuccessResult, TFailureReason>(TFailureReason failureReason)
-        => new (false, default, failureReason);
-
+        => new (failureReason);
 }

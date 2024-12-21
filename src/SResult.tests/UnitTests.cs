@@ -157,4 +157,32 @@ public class UnitTests
 
         return 200;
     }
+
+    [Fact]
+    public void MapBooleanToObjectAsSuccessTest()
+    {
+        var result = MapBooleanToObjectAsSuccess();
+        result
+            .OnSuccess((s) => Assert.Equal(false, s))
+            .OnFailure(() => Assert.Fail());
+    }
+
+    [Fact]
+    public void MapBooleanToObjectAsFailureTest()
+    {
+        var result = MapBooleanToObjectAsFailure();
+        result
+            .OnSuccess(() => Assert.Fail())
+            .OnFailure((f) => Assert.Equal(false, f));
+    }
+
+    private static Result<object, string> MapBooleanToObjectAsSuccess()
+    {
+        return false;
+    }
+
+    private static Result<string, object> MapBooleanToObjectAsFailure()
+    {
+        return false;
+    }
 }

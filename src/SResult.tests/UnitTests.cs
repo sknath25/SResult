@@ -117,7 +117,7 @@ public class UnitTests
     {
         try
         {
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+#pragma warning disable CS8625 // Cannot convert nu/ll literal to non-nullable reference type.
             var result = Result.CreateFailureReason<string, string>(null);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
             Assert.Fail();
@@ -184,5 +184,77 @@ public class UnitTests
     private static Result<string, object> MapBooleanToObjectAsFailure()
     {
         return false;
+    }
+
+    [Fact]
+    public void OnSuccessActionShouldNotBeNull()
+    {
+        try
+        {
+            var result = Result.CreateSuccessResult(false);
+            Action? action = null;
+#pragma warning disable CS8604 // Possible null reference argument.
+            _ = result.OnSuccess(action);
+#pragma warning restore CS8604 // Possible null reference argument.
+            Assert.Fail();
+        }
+        catch (ArgumentNullException)
+        {
+            Assert.True(true);
+        }
+    }
+
+    [Fact]
+    public void OnSuccessParamActionShouldNotBeNull()
+    {
+        try
+        {
+            var result = Result.CreateSuccessResult(false);
+            Action<bool>? action = null;
+#pragma warning disable CS8604 // Possible null reference argument.
+            _ = result.OnSuccess(action);
+#pragma warning restore CS8604 // Possible null reference argument.
+            Assert.Fail();
+        }
+        catch (ArgumentNullException)
+        {
+            Assert.True(true);
+        }
+    }
+
+    [Fact]
+    public void OnFailureActionShouldNotBeNull()
+    {
+        try
+        {
+            var result = Result.CreateFailureReason(false);
+            Action? action = null;
+#pragma warning disable CS8604 // Possible null reference argument.
+            _ = result.OnFailure(action);
+#pragma warning restore CS8604 // Possible null reference argument.
+            Assert.Fail();
+        }
+        catch (ArgumentNullException)
+        {
+            Assert.True(true);
+        }
+    }
+
+    [Fact]
+    public void OnFailureParamActionShouldNotBeNull()
+    {
+        try
+        {
+            var result = Result.CreateFailureReason(false);
+            Action<bool>? action = null;
+#pragma warning disable CS8604 // Possible null reference argument.
+            _ = result.OnFailure(action);
+#pragma warning restore CS8604 // Possible null reference argument.
+            Assert.Fail();
+        }
+        catch (ArgumentNullException)
+        {
+            Assert.True(true);
+        }
     }
 }

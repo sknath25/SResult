@@ -54,7 +54,7 @@ public class UnitTests
     public void OnSuccessAndOnFailureBothCannotBeInvokedForSuccess()
     {
         const int expected = 1;
-        var result = Result.CreateSuccess<int, string>(expected);
+        var result = Result.Good<int, string>(expected);
         int methodInvocationCounter = 0;
 
         result
@@ -102,7 +102,7 @@ public class UnitTests
         try
         {
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            var result = Result.CreateSuccess<string, string>(null);
+            var result = Result.Good<string, string>(null);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
             Assert.Fail();
         }
@@ -118,7 +118,7 @@ public class UnitTests
         try
         {
 #pragma warning disable CS8625 // Cannot convert nu/ll literal to non-nullable reference type.
-            var result = Result.CreateFailure<string, string>(null);
+            var result = Result.Bad<string, string>(null);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
             Assert.Fail();
         }

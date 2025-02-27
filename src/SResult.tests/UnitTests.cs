@@ -69,7 +69,7 @@ public class UnitTests
     {
         const int expected = 1;
         var result = Result.Good(expected);
-        if (result.IsBad(out var validResult, out var failureReason))
+        if (result.IsGood(out var validResult, out var failureReason))
         {
             Assert.Null(failureReason);
             Assert.Equal(expected, validResult);
@@ -85,7 +85,7 @@ public class UnitTests
     {
         const string expected = "Worthless";
         var result = Result.Bad(expected);
-        if (result.IsBad(out var validResult, out var failureReason))
+        if (result.IsGood(out var validResult, out var failureReason))
         {
             Assert.Fail();
         }

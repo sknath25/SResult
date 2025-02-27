@@ -2,23 +2,23 @@
 
 namespace SResult;
 
-public sealed class Result<TGoodResult, TReasonForBad>
+public sealed class Result<TResult, TReason>
 {
-    private readonly TGoodResult? _goodResult;
-    private readonly TReasonForBad? _reasonForBad;
+    private readonly TResult? _result;
+    private readonly TReason? _reason;
     private readonly bool _isSuccess;
 
-    private Result(TReasonForBad? reasonForBad)
+    private Result(TReason? reasonForBad)
     {
         if (reasonForBad == null) throw new ArgumentNullException(nameof(reasonForBad));
-        _reasonForBad = reasonForBad;
+        _reason = reasonForBad;
         _isSuccess = false;
     }
 
-    private Result(TGoodResult successResult)
+    private Result(TResult successResult)
     {
         if (successResult == null) throw new ArgumentNullException(nameof(successResult));
-        _goodResult = successResult;
+        _result = successResult;
         _isSuccess = true;
     }
 
@@ -32,26 +32,26 @@ public sealed class Result<TGoodResult, TReasonForBad>
         return !IsGood();
     }
 
-    public bool IsGood([NotNullWhen(true)] out TGoodResult? goodResult)
+    public bool IsGood([NotNullWhen(true)] out TResult? result)
     {
-        goodResult = _goodResult;
+        result = _result;
         return IsGood();
     }
 
-    public bool IsBad([NotNullWhen(true)] out TGoodResult? goodResult, [NotNullWhen(false)] out TReasonForBad? reasonForBad)
+    public bool IsGood([NotNullWhen(true)] out TResult? result, [NotNullWhen(false)] out TReason? reason)
     {
-        goodResult = _goodResult;
-        reasonForBad = _reasonForBad;
+        result = _result;
+        reason = _reason;
         return IsGood();
     }
 
-    public bool IsBad([NotNullWhen(true)] out TReasonForBad? reasonForBad)
+    public bool IsBad([NotNullWhen(true)] out TReason? reason)
     {
-        reasonForBad = _reasonForBad;
+        reason = _reason;
         return IsBad();
     }
 
-    public Result<TGoodResult, TReasonForBad> WhenGood(Action goodAction)
+    public Result<TResult, TReason> WhenGood(Action goodAction)
     {
         if (goodAction == null) throw new ArgumentNullException(nameof(goodAction));
 
@@ -63,7 +63,7 @@ public sealed class Result<TGoodResult, TReasonForBad>
         return this;
     }
 
-    public Result<TGoodResult, TReasonForBad> WhenGood(Action<TGoodResult> goodAction)
+    public Result<TResult, TReason> WhenGood(Action<TResult> goodAction)
     {
         if (goodAction == null) throw new ArgumentNullException(nameof(goodAction));
 
@@ -75,7 +75,7 @@ public sealed class Result<TGoodResult, TReasonForBad>
         return this;
     }
 
-    public Result<TGoodResult, TReasonForBad> WhenBad(Action badAction)
+    public Result<TResult, TReason> WhenBad(Action badAction)
     {
         if (badAction == null) throw new ArgumentNullException(nameof(badAction));
 
@@ -87,7 +87,7 @@ public sealed class Result<TGoodResult, TReasonForBad>
         return this;
     }
 
-    public Result<TGoodResult, TReasonForBad> WhenBad(Action<TReasonForBad> badAction)
+    public Result<TResult, TReason> WhenBad(Action<TReason> badAction)
     {
         if (badAction == null) throw new ArgumentNullException(nameof(badAction));
 
@@ -99,9 +99,9 @@ public sealed class Result<TGoodResult, TReasonForBad>
         return this;
     }
 
-    public static implicit operator Result<TGoodResult, TReasonForBad>(TGoodResult goodResult)
-        =>  new (goodResult);
+    public static implicit operator Result<TResult, TReason>(TResult result)
+        =>  new (result);
 
-    public static implicit operator Result<TGoodResult, TReasonForBad>(TReasonForBad reasonForBad)
-        => new (reasonForBad);
+    public static implicit operator Result<TResult, TReason>(TReason reason)
+        => new (reason);
 }

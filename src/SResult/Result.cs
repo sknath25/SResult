@@ -2,11 +2,11 @@
 
 public static class Result
 {
-    public static Result<TSuccessResult, TFailureReason> CreateFailureReason<TSuccessResult, TFailureReason>(TFailureReason failureReason) => failureReason;
+    public static Result<TGoodResult, TReasonForBad> CreateFailure<TGoodResult, TReasonForBad>(TReasonForBad reasonForBad) => reasonForBad;
 
-    public static Result<object, TFailureReason> CreateFailureReason<TFailureReason>(TFailureReason failureReason) => failureReason;
+    public static Result<object, TReasonForBad> Bad<TReasonForBad>(TReasonForBad reasonForBad) => reasonForBad;
 
-    public static Result<TSuccessResult, TFailureReason> CreateSuccessResult<TSuccessResult, TFailureReason>(TSuccessResult successResult) => successResult;
+    public static Result<TGoodResult, TReasonForBad> CreateSuccess<TGoodResult, TReasonForBad>(TGoodResult goodResult) => goodResult;
 
-    public static Result<TSuccessResult, object> CreateSuccessResult<TSuccessResult>(TSuccessResult successResult) => successResult;
+    public static Result<TGoodResult, object> Good<TGoodResult>(TGoodResult goodResult) => goodResult;
 }

@@ -2,106 +2,106 @@
 
 namespace SResult;
 
-public sealed class Result<TSuccessResult, TFailureReason>
+public sealed class Result<TGoodResult, TReasonForBad>
 {
-    private readonly TSuccessResult? _successResult;
-    private readonly TFailureReason? _failureReason;
+    private readonly TGoodResult? _goodResult;
+    private readonly TReasonForBad? _reasonForBad;
     private readonly bool _isSuccess;
 
-    private Result(TFailureReason? failureReason)
+    private Result(TReasonForBad? reasonForBad)
     {
-        if (failureReason == null) throw new ArgumentNullException(nameof(failureReason));
-        _failureReason = failureReason;
+        if (reasonForBad == null) throw new ArgumentNullException(nameof(reasonForBad));
+        _reasonForBad = reasonForBad;
         _isSuccess = false;
     }
 
-    private Result(TSuccessResult successResult)
+    private Result(TGoodResult successResult)
     {
         if (successResult == null) throw new ArgumentNullException(nameof(successResult));
-        _successResult = successResult;
+        _goodResult = successResult;
         _isSuccess = true;
     }
 
-    public bool IsSuccess()
+    public bool IsGood()
     {
         return _isSuccess;
     }
 
-    public bool IsFailed()
+    public bool IsBad()
     {
-        return !IsSuccess();
+        return !IsGood();
     }
 
-    public bool IsSuccess([NotNullWhen(true)] out TSuccessResult? successResult)
+    public bool IsGood([NotNullWhen(true)] out TGoodResult? goodResult)
     {
-        successResult = _successResult;
-        return IsSuccess();
+        goodResult = _goodResult;
+        return IsGood();
     }
 
-    public bool IsSuccess([NotNullWhen(true)] out TSuccessResult? successResult, [NotNullWhen(false)] out TFailureReason? failureReason)
+    public bool IsBad([NotNullWhen(true)] out TGoodResult? goodResult, [NotNullWhen(false)] out TReasonForBad? reasonForBad)
     {
-        successResult = _successResult;
-        failureReason = _failureReason;
-        return IsSuccess();
+        goodResult = _goodResult;
+        reasonForBad = _reasonForBad;
+        return IsGood();
     }
 
-    public bool IsFailed([NotNullWhen(true)] out TFailureReason? failureReason)
+    public bool IsBad([NotNullWhen(true)] out TReasonForBad? reasonForBad)
     {
-        failureReason = _failureReason;
-        return IsFailed();
+        reasonForBad = _reasonForBad;
+        return IsBad();
     }
 
-    public Result<TSuccessResult, TFailureReason> OnSuccess(Action actionOnSuccess)
+    public Result<TGoodResult, TReasonForBad> WhenGood(Action goodAction)
     {
-        if (actionOnSuccess == null) throw new ArgumentNullException(nameof(actionOnSuccess));
+        if (goodAction == null) throw new ArgumentNullException(nameof(goodAction));
 
-        if (IsSuccess())
+        if (IsGood())
         {
-            actionOnSuccess();
+            goodAction();
         }
 
         return this;
     }
 
-    public Result<TSuccessResult, TFailureReason> OnSuccess(Action<TSuccessResult> actionOnSuccess)
+    public Result<TGoodResult, TReasonForBad> WhenGood(Action<TGoodResult> goodAction)
     {
-        if (actionOnSuccess == null) throw new ArgumentNullException(nameof(actionOnSuccess));
+        if (goodAction == null) throw new ArgumentNullException(nameof(goodAction));
 
-        if (IsSuccess(out var successResponse))
+        if (IsGood(out var successResponse))
         {
-            actionOnSuccess(successResponse);
+            goodAction(successResponse);
         }
 
         return this;
     }
 
-    public Result<TSuccessResult, TFailureReason> OnFailure(Action actionOnFailure)
+    public Result<TGoodResult, TReasonForBad> WhenBad(Action badAction)
     {
-        if (actionOnFailure == null) throw new ArgumentNullException(nameof(actionOnFailure));
+        if (badAction == null) throw new ArgumentNullException(nameof(badAction));
 
-        if (IsFailed())
+        if (IsBad())
         {
-            actionOnFailure();
+            badAction();
         }
 
         return this;
     }
 
-    public Result<TSuccessResult, TFailureReason> OnFailure(Action<TFailureReason> actionOnFailure)
+    public Result<TGoodResult, TReasonForBad> WhenBad(Action<TReasonForBad> badAction)
     {
-        if (actionOnFailure == null) throw new ArgumentNullException(nameof(actionOnFailure));
+        if (badAction == null) throw new ArgumentNullException(nameof(badAction));
 
-        if (IsFailed(out var failureResponse))
+        if (IsBad(out var failureResponse))
         {
-            actionOnFailure(failureResponse);
+            badAction(failureResponse);
         }
 
         return this;
     }
 
-    public static implicit operator Result<TSuccessResult, TFailureReason>(TSuccessResult successResult)
-        =>  new (successResult);
+    public static implicit operator Result<TGoodResult, TReasonForBad>(TGoodResult goodResult)
+        =>  new (goodResult);
 
-    public static implicit operator Result<TSuccessResult, TFailureReason>(TFailureReason failureReason)
-        => new (failureReason);
+    public static implicit operator Result<TGoodResult, TReasonForBad>(TReasonForBad reasonForBad)
+        => new (reasonForBad);
 }

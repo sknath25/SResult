@@ -5,47 +5,47 @@ public class UnitTests
     [Fact]
     public void SuccessCheck()
     {
-        var result = Result.CreateSuccessResult(1);
-        Assert.True(result.IsSuccess());
+        var result = Result.Good(1);
+        Assert.True(result.IsGood());
     }
 
     [Fact]
     public void FailCheck()
     {
-        var result = Result.CreateFailureReason(0);
-        Assert.True(!result.IsSuccess());
+        var result = Result.Bad(0);
+        Assert.True(!result.IsGood());
     }
 
     [Fact]
     public void OnSuccessResultCheck()
     {
         const int expected = 1;
-        var result = Result.CreateSuccessResult(expected);
+        var result = Result.Good(expected);
         result
-            .OnSuccess((actual) => { Assert.Equal(expected, actual); })
-            .OnFailure(() => { Assert.Fail(); });
+            .WhenGood((actual) => { Assert.Equal(expected, actual); })
+            .WhenBad(() => { Assert.Fail(); });
     }
 
     [Fact]
     public void OnFailureReasonCheck()
     {
         const string expected = "Worthless";
-        var result = Result.CreateFailureReason(expected);
+        var result = Result.Bad(expected);
         result
-            .OnSuccess(() => { Assert.Fail(); })
-            .OnFailure((actual) => { Assert.Equal(expected, actual); });
+            .WhenGood(() => { Assert.Fail(); })
+            .WhenBad((actual) => { Assert.Equal(expected, actual); });
     }
 
     [Fact]
     public void OnSuccessAndOnFailureBothCannotBeInvokedForFailure()
     {
         const string expected = "Worthless";
-        var result = Result.CreateFailureReason(expected);
+        var result = Result.Bad(expected);
         int methodInvocationCounter = 0;
 
         result
-            .OnSuccess(() => methodInvocationCounter++)
-            .OnFailure(() => methodInvocationCounter++);
+            .WhenGood(() => methodInvocationCounter++)
+            .WhenBad(() => methodInvocationCounter++);
 
         Assert.Equal(1, methodInvocationCounter);
     }
@@ -54,12 +54,12 @@ public class UnitTests
     public void OnSuccessAndOnFailureBothCannotBeInvokedForSuccess()
     {
         const int expected = 1;
-        var result = Result.CreateSuccessResult<int, string>(expected);
+        var result = Result.CreateSuccess<int, string>(expected);
         int methodInvocationCounter = 0;
 
         result
-            .OnSuccess(() => methodInvocationCounter++)
-            .OnFailure(() => methodInvocationCounter++);
+            .WhenGood(() => methodInvocationCounter++)
+            .WhenBad(() => methodInvocationCounter++);
 
         Assert.Equal(1, methodInvocationCounter);
     }
@@ -68,8 +68,8 @@ public class UnitTests
     public void FailureReasonWillBeNullForSuccess()
     {
         const int expected = 1;
-        var result = Result.CreateSuccessResult(expected);
-        if (result.IsSuccess(out var validResult, out var failureReason))
+        var result = Result.Good(expected);
+        if (result.IsBad(out var validResult, out var failureReason))
         {
             Assert.Null(failureReason);
             Assert.Equal(expected, validResult);
@@ -84,8 +84,8 @@ public class UnitTests
     public void SuccessResultWillBeNullForFailure()
     {
         const string expected = "Worthless";
-        var result = Result.CreateFailureReason(expected);
-        if (result.IsSuccess(out var validResult, out var failureReason))
+        var result = Result.Bad(expected);
+        if (result.IsBad(out var validResult, out var failureReason))
         {
             Assert.Fail();
         }
@@ -102,7 +102,7 @@ public class UnitTests
         try
         {
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            var result = Result.CreateSuccessResult<string, string>(null);
+            var result = Result.CreateSuccess<string, string>(null);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
             Assert.Fail();
         }
@@ -118,7 +118,7 @@ public class UnitTests
         try
         {
 #pragma warning disable CS8625 // Cannot convert nu/ll literal to non-nullable reference type.
-            var result = Result.CreateFailureReason<string, string>(null);
+            var result = Result.CreateFailure<string, string>(null);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
             Assert.Fail();
         }
@@ -134,8 +134,8 @@ public class UnitTests
         const string expectedFailure = "Url cannot be blank";
         var result = CallApi(string.Empty);
         result
-            .OnSuccess(() => { Assert.Fail(); })
-            .OnFailure((actualFailure) => { Assert.Equal(expectedFailure, actualFailure); });
+            .WhenGood(() => { Assert.Fail(); })
+            .WhenBad((actualFailure) => { Assert.Equal(expectedFailure, actualFailure); });
     }
 
     [Fact]
@@ -144,8 +144,8 @@ public class UnitTests
         const int expectedHttpCode = 200;
         var result = CallApi("http://somedomain.com");
         result
-            .OnSuccess((actualHttpCode) => { Assert.Equal(expectedHttpCode, actualHttpCode); })
-            .OnFailure(() => { Assert.Fail(); });
+            .WhenGood((actualHttpCode) => { Assert.Equal(expectedHttpCode, actualHttpCode); })
+            .WhenBad(() => { Assert.Fail(); });
     }
 
     private static Result<int, string> CallApi(string url)
@@ -163,8 +163,8 @@ public class UnitTests
     {
         var result = MapBooleanToObjectAsSuccess();
         result
-            .OnSuccess((s) => Assert.Equal(false, s))
-            .OnFailure(() => Assert.Fail());
+            .WhenGood((s) => Assert.Equal(false, s))
+            .WhenBad(() => Assert.Fail());
     }
 
     [Fact]
@@ -172,8 +172,8 @@ public class UnitTests
     {
         var result = MapBooleanToObjectAsFailure();
         result
-            .OnSuccess(() => Assert.Fail())
-            .OnFailure((f) => Assert.Equal(false, f));
+            .WhenGood(() => Assert.Fail())
+            .WhenBad((f) => Assert.Equal(false, f));
     }
 
     private static Result<object, string> MapBooleanToObjectAsSuccess()
@@ -191,10 +191,10 @@ public class UnitTests
     {
         try
         {
-            var result = Result.CreateSuccessResult(false);
+            var result = Result.Good(false);
             Action? action = null;
 #pragma warning disable CS8604 // Possible null reference argument.
-            _ = result.OnSuccess(action);
+            _ = result.WhenGood(action);
 #pragma warning restore CS8604 // Possible null reference argument.
             Assert.Fail();
         }
@@ -209,10 +209,10 @@ public class UnitTests
     {
         try
         {
-            var result = Result.CreateSuccessResult(false);
+            var result = Result.Good(false);
             Action<bool>? action = null;
 #pragma warning disable CS8604 // Possible null reference argument.
-            _ = result.OnSuccess(action);
+            _ = result.WhenGood(action);
 #pragma warning restore CS8604 // Possible null reference argument.
             Assert.Fail();
         }
@@ -227,10 +227,10 @@ public class UnitTests
     {
         try
         {
-            var result = Result.CreateFailureReason(false);
+            var result = Result.Bad(false);
             Action? action = null;
 #pragma warning disable CS8604 // Possible null reference argument.
-            _ = result.OnFailure(action);
+            _ = result.WhenBad(action);
 #pragma warning restore CS8604 // Possible null reference argument.
             Assert.Fail();
         }
@@ -245,10 +245,10 @@ public class UnitTests
     {
         try
         {
-            var result = Result.CreateFailureReason(false);
+            var result = Result.Bad(false);
             Action<bool>? action = null;
 #pragma warning disable CS8604 // Possible null reference argument.
-            _ = result.OnFailure(action);
+            _ = result.WhenBad(action);
 #pragma warning restore CS8604 // Possible null reference argument.
             Assert.Fail();
         }

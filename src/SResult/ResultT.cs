@@ -8,54 +8,61 @@ public sealed class Result<TResult, TReason>
     private readonly TReason? _reason;
     private readonly bool _isSuccess;
 
-    private Result(TReason? reasonForBad)
+    private Result(TReason? reason)
     {
-        if (reasonForBad == null) throw new ArgumentNullException(nameof(reasonForBad));
-        _reason = reasonForBad;
+        if (reason == null) throw new ArgumentNullException(nameof(reason));
+        _reason = reason;
         _isSuccess = false;
     }
 
-    private Result(TResult successResult)
+    private Result(TResult result)
     {
-        if (successResult == null) throw new ArgumentNullException(nameof(successResult));
-        _result = successResult;
+        if (result == null) throw new ArgumentNullException(nameof(result));
+        _result = result;
         _isSuccess = true;
     }
 
-    public bool IsGood()
+    public bool IsSuccess()
     {
         return _isSuccess;
     }
 
-    public bool IsBad()
+    public bool IsFail()
     {
-        return !IsGood();
+        return !IsSuccess();
     }
 
-    public bool IsGood([NotNullWhen(true)] out TResult? result)
+    public bool IsSuccess([NotNullWhen(true)] out TResult? result)
     {
         result = _result;
-        return IsGood();
+        return IsSuccess();
     }
 
-    public bool IsGood([NotNullWhen(true)] out TResult? result, [NotNullWhen(false)] out TReason? reason)
+    public bool IsSuccess([NotNullWhen(true)] out TResult? result, [NotNullWhen(false)] out TReason? reason)
     {
         result = _result;
         reason = _reason;
-        return IsGood();
+        return IsSuccess();
     }
 
-    public bool IsBad([NotNullWhen(true)] out TReason? reason)
+    public bool IsFail([NotNullWhen(true)] out TReason? reason)
     {
         reason = _reason;
-        return IsBad();
+        return IsFail();
     }
 
-    public Result<TResult, TReason> WhenGood(Action goodAction)
+    public bool IsFail([NotNullWhen(false)] out TResult? result, [NotNullWhen(true)] out TReason? reason)
+    {
+        result = _result;
+        reason = _reason;
+        return IsFail();
+    }
+
+    public Result<TResult, TReason> OnSuccess(Action goodAction)
     {
         if (goodAction == null) throw new ArgumentNullException(nameof(goodAction));
 
-        if (IsGood())
+        if (IsSuccess())
         {
             goodAction();
         }
@@ -63,11 +70,11 @@ public sealed class Result<TResult, TReason>
         return this;
     }
 
-    public Result<TResult, TReason> WhenGood(Action<TResult> goodAction)
+    public Result<TResult, TReason> OnSuccess(Action<TResult> goodAction)
     {
         if (goodAction == null) throw new ArgumentNullException(nameof(goodAction));
 
-        if (IsGood(out var successResponse))
+        if (IsSuccess(out var successResponse))
         {
             goodAction(successResponse);
         }
@@ -75,11 +82,11 @@ public sealed class Result<TResult, TReason>
         return this;
     }
 
-    public Result<TResult, TReason> WhenBad(Action badAction)
+    public Result<TResult, TReason> OnFail(Action badAction)
     {
         if (badAction == null) throw new ArgumentNullException(nameof(badAction));
 
-        if (IsBad())
+        if (IsFail())
         {
             badAction();
         }
@@ -87,11 +94,11 @@ public sealed class Result<TResult, TReason>
         return this;
     }
 
-    public Result<TResult, TReason> WhenBad(Action<TReason> badAction)
+    public Result<TResult, TReason> OnFail(Action<TReason> badAction)
     {
         if (badAction == null) throw new ArgumentNullException(nameof(badAction));
 
-        if (IsBad(out var failureResponse))
+        if (IsFail(out var failureResponse))
         {
             badAction(failureResponse);
         }

@@ -2,23 +2,23 @@
 
 namespace SResult;
 
-public sealed class Result<TResult, TReason>
+public class Result<TValue, TReason>
 {
-    private readonly TResult? _result;
+    private readonly TValue? _value;
     private readonly TReason? _reason;
     private readonly bool _isSuccess;
 
-    private Result(TReason? reason)
+    protected Result(TReason? reason)
     {
         if (reason == null) throw new ArgumentNullException(nameof(reason));
         _reason = reason;
         _isSuccess = false;
     }
 
-    private Result(TResult result)
+    protected Result(TValue value)
     {
-        if (result == null) throw new ArgumentNullException(nameof(result));
-        _result = result;
+        if (value == null) throw new ArgumentNullException(nameof(value));
+        _value = value;
         _isSuccess = true;
     }
 
@@ -32,15 +32,15 @@ public sealed class Result<TResult, TReason>
         return !IsSuccess();
     }
 
-    public bool IsSuccess([NotNullWhen(true)] out TResult? result)
+    public bool IsSuccess([NotNullWhen(true)] out TValue? value)
     {
-        result = _result;
+        value = _value;
         return IsSuccess();
     }
 
-    public bool IsSuccess([NotNullWhen(true)] out TResult? result, [NotNullWhen(false)] out TReason? reason)
+    public bool IsSuccess([NotNullWhen(true)] out TValue? value, [NotNullWhen(false)] out TReason? reason)
     {
-        result = _result;
+        value = _value;
         reason = _reason;
         return IsSuccess();
     }
@@ -51,64 +51,87 @@ public sealed class Result<TResult, TReason>
         return IsFail();
     }
 
-    public bool IsFail([NotNullWhen(false)] out TResult? result, [NotNullWhen(true)] out TReason? reason)
+    public bool IsFail([NotNullWhen(false)] out TValue? value, [NotNullWhen(true)] out TReason? reason)
     {
-        result = _result;
+        value = _value;
         reason = _reason;
         return IsFail();
     }
 
-    public Result<TResult, TReason> OnSuccess(Action goodAction)
+    public Result<TValue, TReason> OnSuccess(Action action)
     {
-        if (goodAction == null) throw new ArgumentNullException(nameof(goodAction));
+        if (action == null) throw new ArgumentNullException(nameof(action));
 
         if (IsSuccess())
         {
-            goodAction();
+            action();
         }
 
         return this;
     }
 
-    public Result<TResult, TReason> OnSuccess(Action<TResult> goodAction)
+    public Result<TValue, TReason> OnSuccess(Action<TValue> action)
     {
-        if (goodAction == null) throw new ArgumentNullException(nameof(goodAction));
+        if (action == null) throw new ArgumentNullException(nameof(action));
 
         if (IsSuccess(out var successResponse))
         {
-            goodAction(successResponse);
+            action(successResponse);
         }
 
         return this;
     }
 
-    public Result<TResult, TReason> OnFail(Action badAction)
+    public Result<TValue, TReason> OnFail(Action action)
     {
-        if (badAction == null) throw new ArgumentNullException(nameof(badAction));
+        if (action == null) throw new ArgumentNullException(nameof(action));
 
         if (IsFail())
         {
-            badAction();
+            action();
         }
 
         return this;
     }
 
-    public Result<TResult, TReason> OnFail(Action<TReason> badAction)
+    public Result<TValue, TReason> OnFail(Action<TReason> action)
     {
-        if (badAction == null) throw new ArgumentNullException(nameof(badAction));
+        if (action == null) throw new ArgumentNullException(nameof(action));
 
         if (IsFail(out var failureResponse))
         {
-            badAction(failureResponse);
+            action(failureResponse);
         }
 
         return this;
     }
 
-    public static implicit operator Result<TResult, TReason>(TResult result)
-        =>  new (result);
+    public static implicit operator Result<TValue, TReason>(TValue value)
+        => new(value);
 
-    public static implicit operator Result<TResult, TReason>(TReason reason)
-        => new (reason);
+    public static implicit operator Result<TValue, TReason>(TReason reason)
+        => new(reason);
+}
+
+public class Result<TResult> : Result<TResult, Reason>
+{
+    protected Result(TResult result) : base(result)
+    {
+    }
+
+    protected Result(Reason reason) : base(reason)
+    {
+    }
+
+    public static implicit operator Result<TResult>(TResult result) => new(result);
+
+    public static implicit operator Result<TResult>(Reason reason) => new(reason);
+}
+
+public static class Result
+{
+    public static Result<TResult, TReason> Fail<TResult, TReason>(TReason reason) => reason;
+    public static Result<TResult, Reason> Fail<TResult>(Reason reason) => reason;
+    public static Result<TResult, TReason> Success<TResult, TReason>(TResult result) => result;
+    public static Result<TResult, Reason> Success<TResult>(TResult result) => result;
 }

@@ -1,6 +1,6 @@
 namespace SResult.Tests;
 
-public class UnitTests
+public class ResultUnitTests
 {
     [Fact]
     public void SuccessCheck()
@@ -93,6 +93,22 @@ public class UnitTests
         {
             Assert.Equal(default, validResult);
             Assert.Equal(expected, failureReason);
+        }
+    }
+
+    [Fact]
+    public void SuccessValueWillBeNullForFail()
+    {
+        const string expected = "Wrong";
+        var result = Result.Fail<string, string>(expected);
+        if (result.IsFail(out var value, out var reason))
+        {
+            Assert.Null(value);
+            Assert.Equal(expected, reason);
+        }
+        else
+        {
+            Assert.Fail();
         }
     }
 

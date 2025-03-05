@@ -9,7 +9,18 @@ public class ResultOfReasonUnitTests
 
         if (result.IsFail(out var reason))
         {
-            Assert.Equal("Something is wrong", reason.Message);
+            Assert.Equal("Something is wrong", reason);
+        }
+    }
+
+    [Fact]
+    public void ResultOfReasonShouldFailTest2()
+    {
+        var result = Result.Fail("Something is wrong");
+
+        if (result.IsFail(out var reason))
+        {
+            Assert.Equal("Something is wrong", reason);
         }
     }
 
@@ -64,7 +75,7 @@ public class ResultOfReasonUnitTests
 
         if (result.IsFail(out var reason))
         {
-            Assert.Equal("Sumit is a hopeless", reason);
+            Assert.Equal("Sumit is a hopeless", reason.Message);
         }
     }
 
@@ -75,7 +86,7 @@ public class ResultOfReasonUnitTests
 
     public static Result<int> DidSumitPass(int marks)
     {
-        return marks > 50 ? marks : (Reason)"Sumit is a hopeless";
+        return marks > 50 ? marks : Reason.Error("Sumit is a hopeless");
     }
 
     private static Result<int, string> DummyHttpGet(string url)

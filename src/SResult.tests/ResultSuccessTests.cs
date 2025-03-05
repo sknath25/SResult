@@ -1,9 +1,71 @@
+using System.Diagnostics;
+
 namespace SResult.Tests;
 
 public class ResultUnitTests
 {
     [Fact]
-    public void SuccessCheck()
+    public void SuccessWithNoParameterCheck()
+    {
+        var result = Result.Success();
+        Assert.True(result.IsSuccess());
+    }
+
+    [Fact]
+    public void SuccessWithParameterCheck()
+    {
+        var result = Result.Success(1);
+        Assert.True(result.IsSuccess());
+    }
+
+    [Fact]
+    public void SuccessWithParameterCheck2()
+    {
+        var result = Result.Success(1);
+        if(result.IsSuccess(out var value))
+        {
+            Assert.Equal(1, value);
+            return;
+        }
+
+        Assert.Fail();
+    }
+
+    [Fact]
+    public void SuccessWithStringParameterCheck2()
+    {
+        var result = Result.Success("Suman");
+        if (result.IsSuccess(out var value))
+        {
+            Assert.Equal("Suman", value);
+            return;
+        }
+
+        Assert.Fail();
+    }
+
+    [Fact]
+    public void SuccessWithTypeCheck()
+    {
+        var result = Result.Success<int>(1);
+        Assert.True(result.IsSuccess());
+    }
+
+    [Fact]
+    public void SuccessWithTypeCheck4()
+    {
+        var result = Result.Success<int>(1);
+        if (result.IsSuccess(out var value))
+        {
+            Assert.Equal(1, value);
+            return;
+        }
+
+        Assert.Fail();
+    }
+
+    [Fact]
+    public void SuccessWithTypeCheck2()
     {
         var result = Result.Success<int, string>(1);
         Assert.True(result.IsSuccess());

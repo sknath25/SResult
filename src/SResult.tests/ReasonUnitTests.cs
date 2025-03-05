@@ -12,10 +12,12 @@ public class ReasonUnitTests
     [InlineData(ReasonType.Invalid)]
     [InlineData(ReasonType.InvalidArgument)]
     [InlineData(ReasonType.Conflict)]
+    [InlineData(ReasonType.Duplicate)]
+    [InlineData(ReasonType.Inconsistent)]
     public void ReasonTypeShouldMapTypeProperly(ReasonType typeInput)
     {
 
-        var (message, type) = typeInput switch 
+        var (message, type, _) = typeInput switch 
         {            
             ReasonType.NotFound => Reason.NotFound("Some error"),
             ReasonType.Unavailable => Reason.Unavailable("Some error"),
@@ -25,6 +27,8 @@ public class ReasonUnitTests
             ReasonType.Invalid => Reason.Invalid("Some error"),
             ReasonType.InvalidArgument => Reason.InvalidArgument("Some error"),
             ReasonType.Conflict => Reason.Conflict("Some error"),
+            ReasonType.Duplicate => Reason.Duplicate("Some error"),
+            ReasonType.Inconsistent => Reason.Inconsistent("Some error"),
             _ => Reason.Error("Some error")
         };
                 
@@ -36,7 +40,7 @@ public class ReasonUnitTests
     public void ReasonTypeShouldBeError()
     {
 
-        var (message, type) = Reason.Error(new Exception("Some error"));
+        var (message, type, _) = Reason.Error(new Exception("Some error"));
             
         Assert.Equal("Some error", message);
         Assert.Equal(ReasonType.Error, type);

@@ -128,10 +128,33 @@ public class Result<TResult> : Result<TResult, Reason>
     public static implicit operator Result<TResult>(Reason reason) => new(reason);
 }
 
-public static class Result
+public sealed class Result : Result<None, Reason>
 {
-    public static Result<TResult, TReason> Fail<TResult, TReason>(TReason reason) => reason;
-    public static Result<TResult, Reason> Fail<TResult>(Reason reason) => reason;
-    public static Result<TResult, TReason> Success<TResult, TReason>(TResult result) => result;
-    public static Result<TResult, Reason> Success<TResult>(TResult result) => result;
+    private Result() : base(None.Instance)
+    {
+    }
+
+    private Result(Reason reason) : base(reason)
+    {
+    }
+
+    public static implicit operator Result(Reason reason) => new(reason);
+
+    public static Result<TValue, TReason> Fail<TValue, TReason>(TReason reason) => reason;
+    public static Result<TValue, Reason> Fail<TValue>(Reason reason) => reason;
+    public static Result<None> Fail(Reason reason) => reason;
+    public static Result<None> Fail(string reason) => Reason.Error(reason);
+    public static Result<TValue, TReason> Success<TValue, TReason>(TValue value) => value;
+    public static Result<TValue, Reason> Success<TValue>(TValue value) => value;
+    public static Result<string> Success(string value) => value;
+    public static Result<None> Success() => None.Instance;
 }
+
+
+//public static class Result
+//{
+//    public static Result<TResult, TReason> Fail<TResult, TReason>(TReason reason) => reason;
+//    public static Result<TResult, Reason> Fail<TResult>(Reason reason) => reason;
+//    public static Result<TResult, TReason> Success<TResult, TReason>(TResult result) => result;
+//    public static Result<TResult, Reason> Success<TResult>(TResult result) => result;
+//}

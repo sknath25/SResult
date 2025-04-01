@@ -4,8 +4,6 @@ namespace SResult.Tests;
 
 public class ResultFailTests
 {
-   
-
     [Fact]
     public void FailCheck()
     {

@@ -9,18 +9,18 @@ public class ResultOfReasonUnitTests
 
         if (result.IsFail(out var reason))
         {
-            Assert.Equal("Something is wrong", reason);
+            Assert.Equal("Something is wrong", (Reason)reason);
         }
     }
 
     [Fact]
     public void ResultOfReasonShouldFailTest2()
     {
-        var result = Result.Fail("Something is wrong");
+        var result = Result.Fail<string>("Something is wrong");
 
         if (result.IsFail(out var reason))
         {
-            Assert.Equal("Something is wrong", reason);
+            Assert.Equal("Something is wrong", (Reason)reason);
         }
     }
 
@@ -60,7 +60,7 @@ public class ResultOfReasonUnitTests
     [Fact]
     public void ResultOfReasonThroughMethodWithStringToReasonCastingShouldSuccess()
     {
-        var result = DidSumitPass(70);
+        var result = PassResultThroughMethod(70);
 
         if (result.IsSuccess(out var value))
         {
@@ -71,7 +71,7 @@ public class ResultOfReasonUnitTests
     [Fact]
     public void ResultOfReasonThroughMethodWithStringToReasonCastingShouldFail()
     {
-        var result = DidSumitPass(25);
+        var result = PassResultThroughMethod(25);
 
         if (result.IsFail(out var reason))
         {
@@ -79,21 +79,13 @@ public class ResultOfReasonUnitTests
         }
     }
 
-    public static Result<string> DidRajeshPass(bool isPass)
+    public static Result2<string> DidRajeshPass(bool isPass)
     {
         return isPass ? "Rajesh completed assignment" : Reason.Error("Rajesh is a scoundrel");
     }
 
-    public static Result<int> DidSumitPass(int marks)
+    public static Result2<int> PassResultThroughMethod(int marks)
     {
         return marks > 50 ? marks : Reason.Error("Sumit is a hopeless");
-    }
-
-    private static Result<int, string> DummyHttpGet(string url)
-    {
-        if (string.IsNullOrEmpty(url))
-            return Result.Fail<int, string>("Url cannot be blank");
-
-        return Result.Success<int, string>(200);
     }
 }

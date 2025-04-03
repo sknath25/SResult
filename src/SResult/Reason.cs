@@ -1,5 +1,10 @@
 namespace SResult;
 
+public interface IReason
+{
+    string Message { get; }
+}
+
 public enum ReasonType
 {
     Error,
@@ -15,13 +20,7 @@ public enum ReasonType
     Inconsistent
 }
 
-public interface IFail
-{
-    string Message { get; }
-    ReasonType Type { get; }
-}
-
-public record Reason(string Message, ReasonType Type = ReasonType.Error, params object[] Values): IFail
+public record Reason(string Message, ReasonType Type = ReasonType.Error, params object[] Values): IReason
 {
     public static Reason Error(string Message, params object[] values) => new(Message, ReasonType.Error, values);
     public static Reason Error(Exception ex) => new(ex.Message);

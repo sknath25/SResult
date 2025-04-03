@@ -16,33 +16,34 @@ public class ReasonUnitTests
     [InlineData(ReasonType.Inconsistent)]
     public void ReasonTypeShouldMapTypeProperly(ReasonType typeInput)
     {
+        const string reasonMessage = "Some error";
 
         var (message, type, _) = typeInput switch 
         {            
-            ReasonType.NotFound => Reason.NotFound("Some error"),
-            ReasonType.Unavailable => Reason.Unavailable("Some error"),
-            ReasonType.NoContent => Reason.NoContent("Some error"),
-            ReasonType.Forbidden => Reason.Forbidden("Some error"),
-            ReasonType.Unauthorized => Reason.Unauthorized("Some error"),
-            ReasonType.Invalid => Reason.Invalid("Some error"),
-            ReasonType.InvalidArgument => Reason.InvalidArgument("Some error"),
-            ReasonType.Conflict => Reason.Conflict("Some error"),
-            ReasonType.Duplicate => Reason.Duplicate("Some error"),
-            ReasonType.Inconsistent => Reason.Inconsistent("Some error"),
-            _ => Reason.Error("Some error")
+            ReasonType.NotFound => Reason.NotFound(reasonMessage),
+            ReasonType.Unavailable => Reason.Unavailable(reasonMessage),
+            ReasonType.NoContent => Reason.NoContent(reasonMessage),
+            ReasonType.Forbidden => Reason.Forbidden(reasonMessage),
+            ReasonType.Unauthorized => Reason.Unauthorized(reasonMessage),
+            ReasonType.Invalid => Reason.Invalid(reasonMessage),
+            ReasonType.InvalidArgument => Reason.InvalidArgument(reasonMessage),
+            ReasonType.Conflict => Reason.Conflict(reasonMessage),
+            ReasonType.Duplicate => Reason.Duplicate(reasonMessage),
+            ReasonType.Inconsistent => Reason.Inconsistent(reasonMessage),
+            _ => Reason.Error(reasonMessage)
         };
                 
-        Assert.Equal("Some error", message);
+        Assert.Equal(reasonMessage, message);
         Assert.Equal(typeInput, type);
     }
 
     [Fact]
     public void ReasonTypeShouldBeError()
     {
-
-        var (message, type, _) = Reason.Error(new Exception("Some error"));
+        const string reasonMessage = "Some error";
+        var (message, type, _) = Reason.Error(new Exception(reasonMessage));
             
-        Assert.Equal("Some error", message);
+        Assert.Equal(reasonMessage, message);
         Assert.Equal(ReasonType.Error, type);
     }
 }

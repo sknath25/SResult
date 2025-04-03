@@ -2,12 +2,12 @@ using System.Diagnostics;
 
 namespace SResult.Tests;
 
-public class ResultFailTests
+public class Result2FailTests
 {
     [Fact]
     public void FailCheck()
     {
-        var result = Result.Fail<int, int>(0);
+        var result = Result.Fail<int>("");
         Assert.True(!result.IsSuccess());
     }
 
@@ -15,17 +15,17 @@ public class ResultFailTests
     public void OnFailureReasonCheck()
     {
         const string expected = "Worthless";
-        var result = Result.Fail<string, string>(expected);
+        var result = Result.Fail<string>(expected);
         result
             .OnSuccess(() => { Assert.Fail(); })
-            .OnFail((actual) => { Assert.Equal(expected, actual); });
+            .OnFail((actual) => { Assert.Equal(expected, (Reason)actual); });
     }
 
     [Fact]
     public void OnSuccessAndOnFailureBothCannotBeInvokedForFailure()
     {
         const string expected = "Worthless";
-        var result = Result.Fail<string, string>(expected);
+        var result = Result.Fail<string>(expected);
         int methodInvocationCounter = 0;
 
         result
@@ -39,7 +39,7 @@ public class ResultFailTests
     public void SuccessResultWillBeNullForFailure()
     {
         const string expected = "Worthless";
-        var result = Result.Fail<string, string>(expected);
+        var result = Result.Fail<string>(expected);
         if (result.IsSuccess(out var validResult, out var failureReason))
         {
             Assert.Fail();
@@ -47,7 +47,7 @@ public class ResultFailTests
         else
         {
             Assert.Equal(default, validResult);
-            Assert.Equal(expected, failureReason);
+            Assert.Equal(expected, (Reason)failureReason);
         }
     }
 
@@ -55,11 +55,11 @@ public class ResultFailTests
     public void SuccessValueWillBeNullForFail()
     {
         const string expected = "Wrong";
-        var result = Result.Fail<string, string>(expected);
+        var result = Result.Fail<string>(expected);
         if (result.IsFail(out var value, out var reason))
         {
             Assert.Null(value);
-            Assert.Equal(expected, reason);
+            Assert.Equal(expected, (Reason)reason);
         }
         else
         {
@@ -68,11 +68,13 @@ public class ResultFailTests
     }
 
     [Fact]
-    public void FailureHasToHaveAReason()
+    public void FailureHasToHaveAReasonAndCannotBeNull()
     {
         try
         {
-            var result = Result.Fail<string, string>(null);
+#pragma warning disable CS8625 // To test, passing null forcefully make an exception.
+            var result = Result.Fail<string>(null);
+#pragma warning restore CS8625 
             Assert.Fail();
         }
         catch (ArgumentNullException)
@@ -88,7 +90,7 @@ public class ResultFailTests
         var result = CallApi(string.Empty);
         result
             .OnSuccess(() => { Assert.Fail(); })
-            .OnFail((actualFailure) => { Assert.Equal(expectedFailure, actualFailure); });
+            .OnFail((actualFailure) => { Assert.Equal(expectedFailure, (Reason)actualFailure); });
     }
 
     [Fact]
@@ -101,42 +103,14 @@ public class ResultFailTests
             .OnFail(() => { Assert.Fail(); });
     }
 
-    private static Result<int, string> CallApi(string url)
+    private static Result2<int> CallApi(string url)
     {
         if (string.IsNullOrEmpty(url))
         {
-            return "Url cannot be blank";
+            return (Reason)"Url cannot be blank";
         }
 
         return 200;
-    }
-
-    [Fact]
-    public void MapBooleanToObjectAsSuccessTest()
-    {
-        var result = MapBooleanToObjectAsSuccess();
-        result
-            .OnSuccess((s) => Assert.Equal(false, s))
-            .OnFail(() => Assert.Fail());
-    }
-
-    [Fact]
-    public void MapBooleanToObjectAsFailureTest()
-    {
-        var result = MapBooleanToObjectAsFailure();
-        result
-            .OnSuccess(() => Assert.Fail())
-            .OnFail((f) => Assert.Equal(false, f));
-    }
-
-    private static Result<object, string> MapBooleanToObjectAsSuccess()
-    {
-        return false;
-    }
-
-    private static Result<string, object> MapBooleanToObjectAsFailure()
-    {
-        return false;
     }
 
     [Fact]
@@ -144,7 +118,7 @@ public class ResultFailTests
     {
         try
         {
-            var result = Result.Success<object, bool>(false);
+            var result = Result.Success(false);
             Action? action = null;
 #pragma warning disable CS8604 // Possible null reference argument.
             _ = result.OnSuccess(action);
@@ -162,7 +136,7 @@ public class ResultFailTests
     {
         try
         {
-            var result = Result.Success<bool, bool>(false);
+            var result = Result.Success(false);
             Action<bool>? action = null;
 #pragma warning disable CS8604 // Possible null reference argument.
             _ = result.OnSuccess(action);
@@ -180,7 +154,7 @@ public class ResultFailTests
     {
         try
         {
-            var result = Result.Fail<object, bool>(false);
+            var result = Result.Fail<bool>("");
             Action? action = null;
 #pragma warning disable CS8604 // Possible null reference argument.
             _ = result.OnFail(action);
@@ -198,8 +172,8 @@ public class ResultFailTests
     {
         try
         {
-            var result = Result.Fail<object, bool>(false);
-            Action<bool>? action = null;
+            var result = Result.Fail<bool>("");
+            Action<IReason>? action = null;
 #pragma warning disable CS8604 // Possible null reference argument.
             _ = result.OnFail(action);
 #pragma warning restore CS8604 // Possible null reference argument.

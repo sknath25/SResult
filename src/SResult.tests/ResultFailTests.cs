@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace SResult.Tests;
 
 public class Result2FailTests
@@ -18,7 +16,7 @@ public class Result2FailTests
         var result = Result.Fail<string>(expected);
         result
             .OnSuccess(() => { Assert.Fail(); })
-            .OnFail((actual) => { Assert.Equal(expected, (Reason)actual); });
+            .OnFail((actual) => { Assert.Equal(expected, actual.Message); });
     }
 
     [Fact]
@@ -40,14 +38,14 @@ public class Result2FailTests
     {
         const string expected = "Worthless";
         var result = Result.Fail<string>(expected);
-        if (result.IsSuccess(out var validResult, out var failureReason))
+        if (result.IsSuccess(out var value, out var failure))
         {
             Assert.Fail();
         }
         else
         {
-            Assert.Equal(default, validResult);
-            Assert.Equal(expected, (Reason)failureReason);
+            Assert.Equal(default, value);
+            Assert.Equal(expected, failure.Message);
         }
     }
 
@@ -59,7 +57,7 @@ public class Result2FailTests
         if (result.IsFail(out var value, out var reason))
         {
             Assert.Null(value);
-            Assert.Equal(expected, (Reason)reason);
+            Assert.Equal(expected, reason.Message);
         }
         else
         {
@@ -90,7 +88,7 @@ public class Result2FailTests
         var result = CallApi(string.Empty);
         result
             .OnSuccess(() => { Assert.Fail(); })
-            .OnFail((actualFailure) => { Assert.Equal(expectedFailure, (Reason)actualFailure); });
+            .OnFail((actualFailure) => { Assert.Equal(expectedFailure, actualFailure.Message); });
     }
 
     [Fact]

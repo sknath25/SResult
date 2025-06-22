@@ -3,6 +3,7 @@ namespace SResult;
 public interface IReason
 {
     string Message { get; }
+    ReasonLevel Level { get; }
 }
 
 public enum ReasonType
@@ -20,8 +21,35 @@ public enum ReasonType
     Inconsistent
 }
 
-public record Reason(string Message, ReasonType Type = ReasonType.Error, params object[] Values): IReason
+public enum ReasonLevel
 {
+    Error,
+    Warning,
+    Information,
+}
+
+public record Reason(string Message, ReasonType Type = ReasonType.Error, params object[] Values) : IReason
+{
+    public ReasonLevel Level { get; private set; } = ReasonLevel.Information;
+
+    public Reason AsError()
+    {
+        Level = ReasonLevel.Error;
+        return this;
+    }
+
+    public Reason AsWarning()
+    {
+        Level = ReasonLevel.Warning;
+        return this;
+    }
+
+    public Reason AsInformation()
+    {
+        Level = ReasonLevel.Information;
+        return this;
+    }
+
     public static Reason Error(string Message, params object[] values) => new(Message, ReasonType.Error, values);
     public static Reason Error(Exception ex) => new(ex.Message);
     public static Reason NotFound(string Message, params object[] values) => new(Message, ReasonType.NotFound, values);
@@ -36,4 +64,11 @@ public record Reason(string Message, ReasonType Type = ReasonType.Error, params 
     public static Reason Inconsistent(string Message, params object[] values) => new(Message, ReasonType.Inconsistent, values);
 
     public static implicit operator Reason(string Message) => Error(Message);
+}
+
+public static class ReasonLevelExtensions
+{
+    public static bool IsError(this ReasonLevel source) => source == ReasonLevel.Error;
+    public static bool IsWarning(this ReasonLevel source) => source == ReasonLevel.Warning;
+    public static bool IsInformation(this ReasonLevel source) => source == ReasonLevel.Information;
 }

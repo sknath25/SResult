@@ -2,19 +2,19 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SResult;
 
-public class Result2<TValue>
+public class Result<TValue>
 {
     private readonly TValue? _value;
     private readonly IReason? _reason;
     private readonly bool _isSuccess;
 
-    public Result2(IReason reason)
+    public Result(IReason reason)
     {
         _reason = reason ?? throw new ArgumentNullException(nameof(reason));
         _isSuccess = false;
     }
 
-    public Result2(TValue value)
+    public Result(TValue value)
     {
         _value = value ?? throw new ArgumentNullException(nameof(value));
         _isSuccess = true;
@@ -56,7 +56,7 @@ public class Result2<TValue>
         return IsFail();
     }
 
-    public Result2<TValue> OnSuccess(Action action)
+    public Result<TValue> OnSuccess(Action action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
 
@@ -68,7 +68,7 @@ public class Result2<TValue>
         return this;
     }
 
-    public Result2<TValue> OnSuccess(Action<TValue> action)
+    public Result<TValue> OnSuccess(Action<TValue> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
 
@@ -80,7 +80,7 @@ public class Result2<TValue>
         return this;
     }
     
-    public Result2<TValue> OnFail(Action action)
+    public Result<TValue> OnFail(Action action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
 
@@ -92,7 +92,7 @@ public class Result2<TValue>
         return this;
     }
 
-    public Result2<TValue> OnFail(Action<IReason> action)
+    public Result<TValue> OnFail(Action<IReason> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
 
@@ -104,16 +104,16 @@ public class Result2<TValue>
         return this;
     }
 
-    public static implicit operator Result2<TValue>(TValue value)
+    public static implicit operator Result<TValue>(TValue value)
     => new(value);
 
-    public static implicit operator Result2<TValue>(Reason reason)
+    public static implicit operator Result<TValue>(Reason reason)
     => new(reason);    
 }
 
 public sealed class Result 
 {
-    public static Result2<TValue> Fail<TValue>(IReason reason) => new(reason);
-    public static Result2<TValue> Fail<TValue>(Reason reason) => new(reason);
-    public static Result2<TValue> Success<TValue>(TValue value) => new(value);
+    public static Result<TValue> Fail<TValue>(IReason reason) => new(reason);
+    public static Result<TValue> Fail<TValue>(Reason reason) => new(reason);
+    public static Result<TValue> Success<TValue>(TValue value) => new(value);
 }

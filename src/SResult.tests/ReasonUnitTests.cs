@@ -3,34 +3,34 @@ namespace SResult.Tests;
 public class ReasonUnitTests
 {
     [Theory]
-    [InlineData(ReasonType.Error)]
-    [InlineData(ReasonType.NotFound)]
-    [InlineData(ReasonType.Unavailable)]
-    [InlineData(ReasonType.NoContent)]
-    [InlineData(ReasonType.Forbidden)]
-    [InlineData(ReasonType.Unauthorized)]
-    [InlineData(ReasonType.Invalid)]
-    [InlineData(ReasonType.InvalidArgument)]
-    [InlineData(ReasonType.Conflict)]
-    [InlineData(ReasonType.Duplicate)]
-    [InlineData(ReasonType.Inconsistent)]
-    public void ReasonTypeShouldMapTypeProperly(ReasonType typeInput)
+    [InlineData(FailureType.Error)]
+    [InlineData(FailureType.NotFound)]
+    [InlineData(FailureType.Unavailable)]
+    [InlineData(FailureType.NoContent)]
+    [InlineData(FailureType.Forbidden)]
+    [InlineData(FailureType.Unauthorized)]
+    [InlineData(FailureType.Invalid)]
+    [InlineData(FailureType.InvalidArgument)]
+    [InlineData(FailureType.Conflict)]
+    [InlineData(FailureType.Duplicate)]
+    [InlineData(FailureType.Inconsistent)]
+    public void ReasonTypeShouldMapTypeProperly(FailureType typeInput)
     {
         const string reasonMessage = "Some error";
 
         var (message, type, _) = typeInput switch 
         {            
-            ReasonType.NotFound => Reason.NotFound(reasonMessage),
-            ReasonType.Unavailable => Reason.Unavailable(reasonMessage),
-            ReasonType.NoContent => Reason.NoContent(reasonMessage),
-            ReasonType.Forbidden => Reason.Forbidden(reasonMessage),
-            ReasonType.Unauthorized => Reason.Unauthorized(reasonMessage),
-            ReasonType.Invalid => Reason.Invalid(reasonMessage),
-            ReasonType.InvalidArgument => Reason.InvalidArgument(reasonMessage),
-            ReasonType.Conflict => Reason.Conflict(reasonMessage),
-            ReasonType.Duplicate => Reason.Duplicate(reasonMessage),
-            ReasonType.Inconsistent => Reason.Inconsistent(reasonMessage),
-            _ => Reason.Error(reasonMessage)
+            FailureType.NotFound => Failure.NotFound(reasonMessage),
+            FailureType.Unavailable => Failure.Unavailable(reasonMessage),
+            FailureType.NoContent => Failure.NoContent(reasonMessage),
+            FailureType.Forbidden => Failure.Forbidden(reasonMessage),
+            FailureType.Unauthorized => Failure.Unauthorized(reasonMessage),
+            FailureType.Invalid => Failure.Invalid(reasonMessage),
+            FailureType.InvalidArgument => Failure.InvalidArgument(reasonMessage),
+            FailureType.Conflict => Failure.Conflict(reasonMessage),
+            FailureType.Duplicate => Failure.Duplicate(reasonMessage),
+            FailureType.Inconsistent => Failure.Inconsistent(reasonMessage),
+            _ => Failure.Error(reasonMessage)
         };
                 
         Assert.Equal(reasonMessage, message);
@@ -41,9 +41,9 @@ public class ReasonUnitTests
     public void ReasonTypeShouldBeError()
     {
         const string reasonMessage = "Some error";
-        var (message, type, _) = Reason.Error(new Exception(reasonMessage));
+        var (message, type, _) = Failure.Error(new Exception(reasonMessage));
             
         Assert.Equal(reasonMessage, message);
-        Assert.Equal(ReasonType.Error, type);
+        Assert.Equal(FailureType.Error, type);
     }
 }

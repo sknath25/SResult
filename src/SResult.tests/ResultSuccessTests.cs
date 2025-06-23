@@ -68,7 +68,7 @@ public class ResultUnitTests2
     [Fact]
     public void FailCheck()
     {
-        var result = Result.Fail<int>((Reason)"");
+        var result = Result.Fail<int>((Failure)"");
         Assert.True(!result.IsSuccess());
     }
 
@@ -85,7 +85,7 @@ public class ResultUnitTests2
     [Fact]
     public void OnFailureReasonCheck()
     {
-        Reason reason = "Worthless";
+        Failure reason = "Worthless";
         var result = Result.Fail<string>(reason);
         result
             .OnSuccess(() => { Assert.Fail(); })
@@ -95,7 +95,7 @@ public class ResultUnitTests2
     [Fact]
     public void OnSuccessAndOnFailureBothCannotBeInvokedForFailure()
     {
-        Reason reason = "Worthless";
+        Failure reason = "Worthless";
         var result = Result.Fail<string>(reason);
         int methodInvocationCounter = 0;
 
@@ -139,7 +139,7 @@ public class ResultUnitTests2
     [Fact]
     public void SuccessResultWillBeNullForFailure()
     {
-        Reason reason = "Worthless";
+        Failure reason = "Worthless";
         var result = Result.Fail<string>(reason);
         if (result.IsSuccess(out var validResult, out var failureReason))
         {
@@ -155,7 +155,7 @@ public class ResultUnitTests2
     [Fact]
     public void SuccessValueWillBeNullForFail()
     {
-        Reason reason = "Worthless";
+        Failure reason = "Worthless";
         var result = Result.Fail<string>(reason);
         if (result.IsFail(out var value, out var failReason))
         {
@@ -182,5 +182,33 @@ public class ResultUnitTests2
         {
             Assert.True(true);
         }
-    }    
+    }
+
+    [Fact]
+    public void TestParseIntegerSuccess()
+    {
+        var r = TryParseToInteger("101");
+        Assert.True(r.IsSuccess(out var value));
+        Assert.Equal(101, value);
+    }
+
+    [Fact]
+    public void TestParseIntegerFailure()
+    {
+        var r = TryParseToInteger("Suman");
+        Assert.True(r.IsFail(out var failure));
+        Assert.Equal("This is bullshit. Not any number!", failure.Message);
+    }
+
+    public static Result<int> TryParseToInteger(string value)
+    {
+        if (int.TryParse(value, out var val))
+        {
+            return val;
+        }
+        else
+        {
+            return (Failure)"This is bullshit. Not any number!";
+        }
+    }
 }

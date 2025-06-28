@@ -20,10 +20,11 @@ This is an "as simple as it could" and a pure Result pattern library.
         }
         else
         {
-            return (Failure)"The value is not any integer.";
+            return "The value is not any integer.";
         }
     }
 ```
+Hint: It will automatically transform to Result<int> from a failure string and an integer value on success.
 
 ## How to read a Result
 In continuation of the example above
@@ -54,7 +55,9 @@ public bool Handler()
 ```
 
 ## Built in Failure Type
-Initially this was not part of the library. But I end up making basic Failure class for all projects which is same 95% of the time.
-it usually has a string message and a failure type sort of thing. So I thought to make a part of it. So those 95% cases are covered. 
-And free to use custom type when required. 
+Initially this was not part of the library. 
+But I end up making same basic Failure class for all projects most of the time.
+It usually has a string message and a failure type. And that proved sufficient for most of the cases. 
+So I thought to make a part of it. So most cases will be covered. 
+And to use Custom type ```IFailure``` is there.
 

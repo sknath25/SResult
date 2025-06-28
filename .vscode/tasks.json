@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/SResult.sln",
+                "${workspaceFolder}/SResult.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/src/SResult.sln",
+                "${workspaceFolder}/SResult.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/src/SResult.sln"
+                "${workspaceFolder}/SResult.sln"
             ],
             "problemMatcher": "$msCompile"
         },
@@ -44,10 +44,10 @@
             "type": "process",
             "args": [
                 "test",
-                "${workspaceFolder}/src/SResult.sln",
+                "${workspaceFolder}/SResult.sln",
                 "/p:CollectCoverage=true",
                 "/p:CoverletOutputFormat=cobertura",
-                "/p:CoverletOutput=${workspaceFolder}/src/SResult.tests/coverage/results/"
+                "/p:CoverletOutput=${workspaceFolder}/SResult.tests/coverage/results/"
             ],
             "problemMatcher": "$msCompile"
         },
@@ -57,8 +57,8 @@
             "dependsOn":"coverage",
             "type": "process",
             "args": [
-                "-reports:${workspaceFolder}/src/SResult.tests/coverage/results/coverage.cobertura.xml",
-                "-targetdir:${workspaceFolder}/src/SResult.tests/coverage/reports/html",
+                "-reports:${workspaceFolder}/SResult.tests/coverage/results/coverage.cobertura.xml",
+                "-targetdir:${workspaceFolder}/SResult.tests/coverage/reports/html",
             ],
             "problemMatcher": "$msCompile"
         },

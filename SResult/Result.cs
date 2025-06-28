@@ -79,7 +79,7 @@ public class Result<TValue>
 
         return this;
     }
-    
+
     public Result<TValue> OnFail(Action action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
@@ -104,16 +104,17 @@ public class Result<TValue>
         return this;
     }
 
-    public static implicit operator Result<TValue>(TValue value)
-    => new(value);
+    public static implicit operator Result<TValue>(TValue value) => new(value);
 
-    public static implicit operator Result<TValue>(Failure failure)
-    => new(failure);    
+    public static implicit operator Result<TValue>(Failure failure) => new(failure);
+
+    public static implicit operator Result<TValue>(string failure) => new(Failure.Error(failure));
 }
 
-public sealed class Result 
+public sealed class Result
 {
-    public static Result<TValue> Fail<TValue>(IFailure failure) => new(failure);
-    public static Result<TValue> Fail<TValue>(Failure failure) => new(failure);
     public static Result<TValue> Success<TValue>(TValue value) => new(value);
+    public static Result<TValue> Fail<TValue>(IFailure failure) => new(failure);
+    public static Result<TValue> Fail<TValue>(Failure failure) => new(failure);    
+    public static Result<string> Fail(Failure failure) => new(failure as IFailure);
 }

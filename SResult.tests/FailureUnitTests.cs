@@ -1,6 +1,6 @@
 namespace SResult.Tests;
 
-public class ReasonUnitTests
+public class FailureUnitTests
 {
     [Theory]
     [InlineData(FailureType.Error)]

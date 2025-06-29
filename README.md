@@ -36,10 +36,9 @@ else Console.WriteLine(failure.Message);
 
 ```
 The usual approach is to throw an exception when trying to access the Value when it Failed.
-But that brings additional concern on how the code is written and a proper exception handling.
-But here we will have to check for Success or Failure to gain access to the Value or the Failure.
-This is to reduce the concern discussed above.
-
+But that brings additional concern on how and when the Result or the Value being accessed. 
+Here we will not get Value or Result without checking success or failure. 
+So, to me that should make code more descriptive. 
 
 ## Do something before returning
 ```csharp
@@ -54,10 +53,85 @@ public bool Handler()
 
 ```
 
-## Built in Failure Type
+## Failure Level 
+Some time type isn't enough and a another layer required to feel the context. 
+The caller gets a failure for a task in series. But for some operation, the nature of the failure could by confirm failure or may be failure. 
+In this case caller has to make a choice if it would like to proceed or abort.
+For this we have the additional layer in which we can set a Failure as *Warning* or *Fatal*. 
+Use the ```AsWarning()``` or ```AsFatal()``` method to decorate Failure accordingly.
+For example: 
+```csharp
+return Result.Unavailable("The payment service timed out. The final status of the payment is unknown.").AsWarning();
+```
+or
+```csharp
+return Result.Conflict("Please resolve the conflict before proceeding further!").AsFatal();
+```
+The Warning is the default.
+And to check use ```IsWarning()``` or ```IsFatal()``` extension method of the Failure. 
+For example:
+```csharp
+var result = await MakePaymentAsync(args);
+if(result.IsFailure(out var failure))
+{
+    if(failure.Level.IsWarning())
+    {
+        // Continue making purchase..
+    }
+    else
+    {
+        // Abort. 
+    }
+}
+```
+
+## Built in Failure class
 Initially this was not part of the library. 
 But I end up making same basic Failure class for all projects most of the time.
 It usually has a string message and a failure type. And that proved sufficient for most of the cases. 
 So I thought to make a part of it. So most cases will be covered. 
 And to use Custom type ```IFailure``` is there.
+
+## Failure type (Only for builtin Failure class):
+Sometime we want to send additional information with Failure message like the Failure type. 
+It could be a Duplicate when saving to database or a Conflict when dealing with file or an Unauthorize when dealing with login etc. 
+Eor example, ```Failure.Forbidden("..."), Failure.Conflict("...")``` etc. 
+Note: This is a feature of Builtin Failure class only. Not a rocket science, we can have our own ways for out custom types. 
+```csharp
+    public async Task<Result<string>> Login(string username, string password)
+    {
+        // Code to authenticate.
+        // authSuccess and authToken are imaginary variables here to explain the usages.
+
+        if(authSuccess)
+        {
+           return authToken;
+        }
+        else
+        {
+            return Failure.Forbidden("Access denied! Invalid username or password.");
+        }
+
+        // Code to save the entity
+
+        return 1;
+    }
+```
+### Here is the list of types available: 
+    Error (Default),
+    NotFound,
+    Unavailable,
+    NoContent,
+    Forbidden,
+    Unauthorized,
+    Invalid,
+    InvalidArgument,
+    Conflict,
+    Duplicate,
+    Inconsistent
+
+
+
+
+
 

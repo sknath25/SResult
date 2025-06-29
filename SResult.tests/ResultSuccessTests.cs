@@ -36,14 +36,74 @@ public class ResultUnitTests2
     }
 
     [Fact]
-    public void MakeSimpleFailureCastedValueTest()
+    public void MakeSimpleFailureCastToStringTest()
     {
-        var failure = (Failure)"Something is wrong";
+        Failure failure = "Something is wrong";
         Assert.Equal("Something is wrong", failure.Message);
     }
 
     [Fact]
+    public void MakeStringCastToFailureTest()
+    {
+        string failure = Failure.Error("Something is wrong");
+        Assert.Equal("Something is wrong", failure);
+    }
+
+    [Fact]
+    public void MakeFailureAsDefaultTest()
+    {
+        var failure = Failure.Unauthorized("Something is wrong");
+        Assert.Equal("Something is wrong", failure.Message);
+        Assert.True(failure.Level.IsWarning());
+    }
+
+    [Fact]
+    public void MakeFailureAsWarningTest()
+    {
+        var failure = Failure.Unauthorized("Something is wrong").AsWarning();
+        Assert.Equal("Something is wrong", failure.Message);
+        Assert.True(failure.Level.IsWarning());
+    }
+
+    [Fact]
+    public void MakeFailureAsFatalTest()
+    {
+        var failure = Failure.Unauthorized("Something is wrong").AsFatal();
+        Assert.Equal("Something is wrong", failure.Message);
+        Assert.True(failure.Level.IsFatal());
+    }
+
+    [Fact]
+    public void MakeFailureAsFatalFromCallerTest()
+    {
+        var result = ReturnsFatalError();
+        if (result.IsFail(out var failure))
+        {
+            Assert.Equal("Something is wrong", failure.Message);
+            Assert.True(failure.Level.IsFatal());
+        }
+        else
+        {
+            Assert.Fail();
+        }
+    }
+
+    static Result<int> ReturnsFatalError()
+    {
+        return ((Failure)"Something is wrong").AsFatal();
+    }
+
+    [Fact]
     public void OnSuccessTest()
+    {
+        var result = Result.Success(11);
+        result
+            .OnSuccess(() => { Assert.True(true); })
+            .OnFail(() => { Assert.Fail(); });
+    }
+
+    [Fact]
+    public void OnSuccessTestWithValue()
     {
         var result = Result.Success(11);
         result
@@ -52,7 +112,84 @@ public class ResultUnitTests2
     }
 
     [Fact]
+    public void OnSuccessShouldThrowExceptionForNullActionTest()
+    {
+        try
+        {
+#pragma warning disable CS8600, CS8604
+            Action action = null;
+            Result.Success(11).OnSuccess(action);
+#pragma warning restore CS8600, CS8604
+            Assert.Fail();
+        }
+        catch (ArgumentNullException)
+        {
+            Assert.True(true);
+        }
+    }
+
+    [Fact]
+    public void OnSuccessShouldThrowExceptionForNullGenericActionTest()
+    {
+        try
+        {
+#pragma warning disable CS8600, CS8604
+            Action<int> action = null;
+            Result.Success(11).OnSuccess(action);
+#pragma warning restore CS8600, CS8604
+            Assert.Fail();
+        }
+        catch (ArgumentNullException)
+        {
+            Assert.True(true);
+        }
+    }
+
+    [Fact]
+    public void OnFailureShouldThrowExceptionForNullActionTest()
+    {
+        try
+        {
+#pragma warning disable CS8600, CS8604
+            Action action = null;
+            Result.Fail("Massive problem here!").OnFail(action);
+#pragma warning restore CS8600, CS8604
+            Assert.Fail();
+        }
+        catch (ArgumentNullException)
+        {
+            Assert.True(true);
+        }
+    }
+
+    [Fact]
+    public void OnFailureShouldThrowExceptionForNullGenericActionTest()
+    {
+        try
+        {
+#pragma warning disable CS8600, CS8604
+            Action<IFailure> action = null;
+            Result.Fail("Massive problem here!").OnFail(action);
+#pragma warning restore CS8600, CS8604
+            Assert.Fail();
+        }
+        catch (ArgumentNullException)
+        {
+            Assert.True(true);
+        }
+    }
+
+    [Fact]
     public void OnFailureTest()
+    {
+        var result = Result.Fail("Something is wrong!");
+        result
+            .OnSuccess(() => { Assert.Fail(); })
+            .OnFail(() => { Assert.True(true); });
+    }
+
+    [Fact]
+    public void OnFailureTestWithFailure()
     {
         var result = Result.Fail("Something is wrong!");
         result
@@ -110,9 +247,9 @@ public class ResultUnitTests2
     {
         try
         {
-            #pragma warning disable CS8625 // To test, passing null forcefully make an exception.
+#pragma warning disable CS8625 // To test, passing null forcefully make an exception.
             var result = Result.Success<string>(null);
-            #pragma warning restore CS8625 
+#pragma warning restore CS8625
             Assert.Fail();
         }
         catch (ArgumentNullException)

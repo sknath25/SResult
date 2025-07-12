@@ -61,8 +61,8 @@ public record Failure(string Message, FailureType Type = FailureType.Error, para
     public static Failure Unavailable(string Message, params object[] values) => new(Message, FailureType.Unavailable, values);
     public static Failure Duplicate(string Message, params object[] values) => new(Message, FailureType.Duplicate, values);
     public static Failure Inconsistent(string Message, params object[] values) => new(Message, FailureType.Inconsistent, values);
-    public static implicit operator Failure(string Message) => Error(Message);
-    public static implicit operator string(Failure failure) => failure.Message;
+    //public static implicit operator Failure(string Message) => Error(Message);
+    //public static implicit operator string(Failure failure) => failure.Message;
 }
 
 public static class ReasonLevelExtensions

@@ -4,63 +4,36 @@ namespace SResult;
 
 public class Result<TValue>
 {
-    private readonly TValue? _value;
-    private readonly IFailure? _failure;
-    private readonly bool _isSuccess;
+    public TValue? Value { get; }
+    public IFailure? Failure { get; }
+
+    [MemberNotNullWhen(true, nameof(Value))]
+    [MemberNotNullWhen(false, nameof(Failure))]
+    public bool IsSuccess { get; }
+
+    [MemberNotNullWhen(false, nameof(Value))]
+    [MemberNotNullWhen(true, nameof(Failure))]
+    public bool IsFailed { get; }
 
     public Result(IFailure failure)
     {
-        _failure = failure ?? throw new ArgumentNullException(nameof(failure));
-        _isSuccess = false;
+        Failure = failure ?? throw new ArgumentNullException(nameof(failure));
+        IsSuccess = false;
+        IsFailed = !IsSuccess;
     }
 
     public Result(TValue value)
     {
-        _value = value ?? throw new ArgumentNullException(nameof(value));
-        _isSuccess = true;
-    }
-
-    public bool IsSuccess()
-    {
-        return _isSuccess;
-    }
-
-    public bool IsFail()
-    {
-        return !IsSuccess();
-    }
-
-    public bool IsSuccess([NotNullWhen(true)] out TValue? value)
-    {
-        value = _value;
-        return IsSuccess();
-    }
-
-    public bool IsSuccess([NotNullWhen(true)] out TValue? value, [NotNullWhen(false)] out IFailure? failure)
-    {
-        value = _value;
-        failure = _failure;
-        return IsSuccess();
-    }
-
-    public bool IsFail([NotNullWhen(true)] out IFailure? failure)
-    {
-        failure = _failure;
-        return IsFail();
-    }
-
-    public bool IsFail([NotNullWhen(false)] out TValue? value, [NotNullWhen(true)] out IFailure? failure)
-    {
-        value = _value;
-        failure = _failure;
-        return IsFail();
+        Value = value ?? throw new ArgumentNullException(nameof(value));
+        IsSuccess = true;
+        IsFailed = !IsSuccess;
     }
 
     public Result<TValue> OnSuccess(Action action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
 
-        if (IsSuccess())
+        if (IsSuccess)
         {
             action();
         }
@@ -72,9 +45,9 @@ public class Result<TValue>
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
 
-        if (IsSuccess(out var value))
+        if (IsSuccess)
         {
-            action(value);
+            action(Value);
         }
 
         return this;
@@ -84,7 +57,7 @@ public class Result<TValue>
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
 
-        if (IsFail())
+        if (!IsSuccess)
         {
             action();
         }
@@ -96,9 +69,9 @@ public class Result<TValue>
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
 
-        if (IsFail(out var failure))
+        if (!IsSuccess)
         {
-            action(failure);
+            action(Failure);
         }
 
         return this;
@@ -107,14 +80,12 @@ public class Result<TValue>
     public static implicit operator Result<TValue>(TValue value) => new(value);
 
     public static implicit operator Result<TValue>(Failure failure) => new(failure);
-
-    public static implicit operator Result<TValue>(string failure) => new(Failure.Error(failure));
 }
 
 public sealed class Result
 {
     public static Result<TValue> Success<TValue>(TValue value) => new(value);
     public static Result<TValue> Fail<TValue>(IFailure failure) => new(failure);
-    public static Result<TValue> Fail<TValue>(Failure failure) => new(failure);    
-    public static Result<string> Fail(Failure failure) => new(failure as IFailure);
+    public static Result<TValue> Fail<TValue>(Failure failure) => new(failure);
+    public static Result<TValue> Fail<TValue>(string failure) => new(Failure.Error(failure));
 }

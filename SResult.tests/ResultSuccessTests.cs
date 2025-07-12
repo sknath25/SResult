@@ -5,10 +5,10 @@ public class ResultUnitTests2
     [Fact]
     public void MakeSimpleFailureTest()
     {
-        var result = Result.Fail("Something is wrong");
-        if (result.IsFail(out var reason))
+        var result = Result.Fail<int>("Something is wrong");
+        if (!result.IsSuccess)
         {
-            Assert.Equal("Something is wrong", reason.Message);
+            Assert.Equal("Something is wrong", result.Failure.Message);
         }
     }
 
@@ -16,9 +16,9 @@ public class ResultUnitTests2
     public void MakeSimpleSuccessTest()
     {
         var result = Result.Success("Something is good");
-        if (result.IsSuccess(out var value))
+        if (result.IsSuccess)
         {
-            Assert.Equal("Something is good", value);
+            Assert.Equal("Something is good", result.Value);
         }
     }
 
@@ -26,27 +26,13 @@ public class ResultUnitTests2
     public void MakeSimpleSuccessFromValueTest()
     {
         var result = Result.Success(1);
-        if (result.IsSuccess(out var value))
+        if (result.IsSuccess)
         {
-            Assert.Equal(1, value);
+            Assert.Equal(1, result.Value);
             return;
         }
 
         Assert.Fail();
-    }
-
-    [Fact]
-    public void MakeSimpleFailureCastToStringTest()
-    {
-        Failure failure = "Something is wrong";
-        Assert.Equal("Something is wrong", failure.Message);
-    }
-
-    [Fact]
-    public void MakeStringCastToFailureTest()
-    {
-        string failure = Failure.Error("Something is wrong");
-        Assert.Equal("Something is wrong", failure);
     }
 
     [Fact]
@@ -71,26 +57,6 @@ public class ResultUnitTests2
         var failure = Failure.Unauthorized("Something is wrong").AsFatal();
         Assert.Equal("Something is wrong", failure.Message);
         Assert.True(failure.Level.IsFatal());
-    }
-
-    [Fact]
-    public void MakeFailureAsFatalFromCallerTest()
-    {
-        var result = ReturnsFatalError();
-        if (result.IsFail(out var failure))
-        {
-            Assert.Equal("Something is wrong", failure.Message);
-            Assert.True(failure.Level.IsFatal());
-        }
-        else
-        {
-            Assert.Fail();
-        }
-    }
-
-    static Result<int> ReturnsFatalError()
-    {
-        return ((Failure)"Something is wrong").AsFatal();
     }
 
     [Fact]
@@ -152,7 +118,7 @@ public class ResultUnitTests2
         {
 #pragma warning disable CS8600, CS8604
             Action action = null;
-            Result.Fail("Massive problem here!").OnFail(action);
+            Result.Fail<int>("Massive problem here!").OnFail(action);
 #pragma warning restore CS8600, CS8604
             Assert.Fail();
         }
@@ -169,7 +135,7 @@ public class ResultUnitTests2
         {
 #pragma warning disable CS8600, CS8604
             Action<IFailure> action = null;
-            Result.Fail("Massive problem here!").OnFail(action);
+            Result.Fail<int>("Massive problem here!").OnFail(action);
 #pragma warning restore CS8600, CS8604
             Assert.Fail();
         }
@@ -182,7 +148,7 @@ public class ResultUnitTests2
     [Fact]
     public void OnFailureTest()
     {
-        var result = Result.Fail("Something is wrong!");
+        var result = Result.Fail<int>("Something is wrong!");
         result
             .OnSuccess(() => { Assert.Fail(); })
             .OnFail(() => { Assert.True(true); });
@@ -191,7 +157,7 @@ public class ResultUnitTests2
     [Fact]
     public void OnFailureTestWithFailure()
     {
-        var result = Result.Fail("Something is wrong!");
+        var result = Result.Fail<int>("Something is wrong!");
         result
             .OnSuccess(() => { Assert.Fail(); })
             .OnFail((failure) => { Assert.Equal("Something is wrong!", failure.Message); });
@@ -201,10 +167,10 @@ public class ResultUnitTests2
     public void NullFailureForSuccessTest()
     {
         var result = Result.Success(21);
-        if (result.IsSuccess(out var validResult, out var failureReason))
+        if (result.IsSuccess)
         {
-            Assert.Null(failureReason);
-            Assert.Equal(21, validResult);
+            Assert.Null(result.Failure);
+            Assert.Equal(21, result.Value);
         }
         else
         {
@@ -216,25 +182,25 @@ public class ResultUnitTests2
     public void NullValueForFailureTest()
     {
         var result = Result.Fail<int>("Something is wrong!");
-        if (result.IsSuccess(out var validResult, out var failureReason))
+        if (result.IsSuccess)
         {
             Assert.Fail();
         }
         else
         {
-            Assert.Equal(default, validResult);
-            Assert.Equal("Something is wrong!", failureReason.Message);
+            Assert.Equal(default, result.Value);
+            Assert.Equal("Something is wrong!", result.Failure.Message);
         }
     }
 
     [Fact]
     public void SuccessValueWillBeNullForFail()
     {
-        var result = Result.Fail("Something is wrong!");
-        if (result.IsFail(out var value, out var failReason))
+        var result = Result.Fail<string>("Something is wrong!");
+        if (result.IsFailed)
         {
-            Assert.Null(value);
-            Assert.Equal("Something is wrong!", failReason.Message);
+            Assert.Null(result.Value);
+            Assert.Equal("Something is wrong!", result.Failure.Message);
         }
         else
         {
@@ -262,16 +228,16 @@ public class ResultUnitTests2
     public void TestParseIntegerSuccess()
     {
         var r = TryParseToInteger("101");
-        Assert.True(r.IsSuccess(out var value));
-        Assert.Equal(101, value);
+        Assert.True(r.IsSuccess);
+        Assert.Equal(101, r.Value);
     }
 
     [Fact]
     public void TestParseIntegerFailure()
     {
         var r = TryParseToInteger("Suman");
-        Assert.True(r.IsFail(out var failure));
-        Assert.Equal("This is bullshit. Not any number!", failure.Message);
+        Assert.False(r.IsSuccess);
+        Assert.Equal("This is bullshit. Not any number!", r.Failure.Message);
     }
 
     public static Result<int> TryParseToInteger(string value)
@@ -282,7 +248,7 @@ public class ResultUnitTests2
         }
         else
         {
-            return "This is bullshit. Not any number!";
+            return Result.Fail<int>("This is bullshit. Not any number!");
         }
     }
 }
